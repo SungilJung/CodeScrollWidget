@@ -13,7 +13,9 @@ public class CSPieChart extends CSWidget {
 
 	@Override
 	protected void drawWidget(GC gc) {
-		
+		System.out.println("");
+		System.out.println("");
+		System.out.println("");
 	}
 
 
