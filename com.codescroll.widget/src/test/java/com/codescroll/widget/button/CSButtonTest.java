@@ -86,7 +86,7 @@ public class CSButtonTest {
 		CSButton button3 = new CSButton(composite,type, ColorThemeFactory.getColorTheme(colorTheme));
 		button3.setBorder(border);
 		button3.setButtonImage(new Image(null,
-				CSButton.class.getClassLoader().getResourceAsStream("com/codescroll/widget/button/test2.png")));
+				CSButton.class.getClassLoader().getResourceAsStream("com/codescroll/widget/button/ButtonImage2.png")));
 		button3.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		button3.setButtonText("테스트 실행");
 		button3.addSelectionListener(new SelectionListener() {
