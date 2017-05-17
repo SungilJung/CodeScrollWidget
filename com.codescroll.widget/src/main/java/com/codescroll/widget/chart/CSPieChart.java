@@ -1,15 +1,22 @@
 package com.codescroll.widget.chart;
 
-import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
 
-public class CSPieChart extends Canvas {
+import com.codescroll.widget.CSWidget;
 
-	public CSPieChart(Composite parent, int style) {
-		super(parent, style);
-		
+public class CSPieChart extends CSWidget {
+
+	public CSPieChart(Composite paramComposite) {
+		super(paramComposite);
+	}
+
+	@Override
+	protected void drawWidget(GC gc) {
+		System.out.println("");
 		System.out.println("");
 		System.out.println("");
 	}
+
 
 }
