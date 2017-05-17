@@ -7,6 +7,8 @@ public class CSPieChart extends Canvas {
 
 	public CSPieChart(Composite parent, int style) {
 		super(parent, style);
+		
+		System.out.println("");
 	}
 
 }
