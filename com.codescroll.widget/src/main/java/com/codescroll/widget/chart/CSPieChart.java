@@ -9,6 +9,7 @@ public class CSPieChart extends Canvas {
 		super(parent, style);
 		
 		System.out.println("");
+		System.out.println("");
 	}
 
 }
