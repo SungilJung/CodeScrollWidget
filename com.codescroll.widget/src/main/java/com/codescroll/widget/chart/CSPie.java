@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import com.codescroll.widget.CSWidget;
 
-public class CSPieChart extends CSWidget {
+public class CSPie extends CSWidget {
 
 	public static final int MAX_VALUE = 100;
 	public static final int MIN_VALUE = 0;
@@ -23,8 +23,9 @@ public class CSPieChart extends CSWidget {
 	private Map<CircleKind, Color> colorMap;
 	
 	private int goal;
+	private int preValue;
 	
-	public CSPieChart(Composite paramComposite) {
+	public CSPie(Composite paramComposite) {
 		super(paramComposite);
 		init();
 	}
@@ -59,12 +60,12 @@ public class CSPieChart extends CSWidget {
 		gc.fillArc(PADDING, PADDING, point.x - PADDING * 2, point.y - PADDING * 2, 90, -arc);
 
 		int innerCirclePadding = PADDING * 4;
-		gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+		gc.setBackground(getBackground());
 		gc.fillArc(innerCirclePadding, innerCirclePadding, point.x - innerCirclePadding * 2,
 				point.y - innerCirclePadding * 2, 0, (int) (MAX_VALUE * ANGLE));
 		
 		Point textPoint = getTextPoint(String.format("%d%%", goal));
-		gc.drawText(String.format("%d%%", goal), (point.x / 2) - (textPoint.x / 2 - 5), (point.y / 2) - (textPoint.y / 2), true);
+		gc.drawText(String.format("%d%%", goal), (point.x / 2) - (textPoint.x / 2), (point.y / 2) - (textPoint.y / 2), true);
 	}
 	
 	private Point getTextPoint(String str){
@@ -80,8 +81,28 @@ public class CSPieChart extends CSWidget {
 	}
 
 	public void setValue(int value) {
-		int max = calValue(value);
-		new UIThread(max).start();
+		
+		final int max = calValue(value);
+		
+		initValue();
+		
+		getDisplay().timerExec(10, new Runnable() {
+			
+			@Override
+			public void run() {
+				if (goal < max){
+					goal++;
+					redraw();
+					
+					getDisplay().timerExec(10, this);
+				}
+			}
+		});
+	}
+	
+	private void initValue(){
+		preValue = goal;
+		goal = MIN_VALUE;
 	}
 	
 	private int calValue(int value){
@@ -92,39 +113,6 @@ public class CSPieChart extends CSWidget {
 		} else {
 			return value;
 		}
-	}
-	
-	private class UIThread extends Thread {
-		
-		private int max;
-
-		public UIThread(int max) {
-			this.max = max;
-		}
-
-		@Override
-		public void run() {
-
-			if (!isDisposed()) {
-				for (int n = 1; n <= max; n++) {
-					goal = n;
-
-					getDisplay().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							redraw();
-						}
-					});
-
-					try {
-						Thread.sleep(10);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-
 	}
 
 }
