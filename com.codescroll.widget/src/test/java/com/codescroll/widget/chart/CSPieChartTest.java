@@ -1,6 +1,7 @@
 package com.codescroll.widget.chart;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
@@ -25,8 +26,10 @@ public class CSPieChartTest {
 		pieChart = new CSPieChart(shell, SWT.NONE);
 		pieChart.setLayoutData(new GridData(GridData.FILL_BOTH));
 		pieChart.setBackground(display.getSystemColor(SWT.COLOR_BLUE));
-		pieChart.setTitle("hi");
+		pieChart.setForeground(display.getSystemColor(SWT.COLOR_GREEN));
+		pieChart.setTitle("분기");
 		shell.open();
+		pieChart.setValue(100);
 		
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch())

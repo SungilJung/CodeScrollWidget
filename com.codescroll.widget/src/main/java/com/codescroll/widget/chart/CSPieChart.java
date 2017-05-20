@@ -49,9 +49,6 @@ public class CSPieChart extends Composite{
 		
 	}
 	
-	
-
-	
 	public void setTitle(String title){
 		checkWidget();
 		titleLabel.setText(title);
@@ -66,7 +63,6 @@ public class CSPieChart extends Composite{
 	public void setForeground(Color color) {
 		checkWidget();
 		pie.setForeground(color);
-		titleLabel.setForeground(color);
 	}
 	
 	@Override
@@ -81,6 +77,11 @@ public class CSPieChart extends Composite{
 		checkWidget();
 		pie.setFont(font);
 		titleLabel.setFont(font);
+	}
+	
+	public void setTitleColor(Color color){
+		checkWidget();
+		titleLabel.setForeground(color);
 	}
 	
 	@Override

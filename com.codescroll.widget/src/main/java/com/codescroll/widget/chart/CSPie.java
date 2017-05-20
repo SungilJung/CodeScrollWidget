@@ -23,7 +23,7 @@ public class CSPie extends CSWidget {
 	private Map<CircleKind, Color> colorMap;
 	
 	private int goal;
-	private int preValue;
+	private int preGoal;
 	
 	public CSPie(Composite paramComposite) {
 		super(paramComposite);
@@ -39,7 +39,7 @@ public class CSPie extends CSWidget {
 		colorMap = new HashMap<CircleKind, Color>();
 		colorMap.put(CircleKind.CALCULATION, getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
 		colorMap.put(CircleKind.CURRENT_VALUE, getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
-		colorMap.put(CircleKind.PREVIOUS_VALUE, getDisplay().getSystemColor(SWT.COLOR_GREEN));
+		colorMap.put(CircleKind.PREVIOUS_VALUE, getDisplay().getSystemColor(SWT.COLOR_DARK_YELLOW));
 	}
 
 	private void initFont() {
@@ -49,12 +49,16 @@ public class CSPie extends CSWidget {
 	@Override
 	protected void drawWidget(GC gc) {
 		int arc = (int) (goal * ANGLE);// 360/100 = 3.6
+		int preArc = (int)(preGoal * ANGLE);
 		Point point = getSize();
 
 		gc.setAntialias(SWT.ON);
 
 		gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
 		gc.fillArc(PADDING, PADDING, point.x - PADDING * 2, point.y - PADDING * 2, 0, (int) (MAX_VALUE * ANGLE));
+
+		gc.setBackground(colorMap.get(CircleKind.PREVIOUS_VALUE));
+		gc.fillArc(PADDING, PADDING, point.x - PADDING * 2, point.y - PADDING * 2, 90, -preArc);
 
 		gc.setBackground(colorMap.get(CircleKind.CURRENT_VALUE));
 		gc.fillArc(PADDING, PADDING, point.x - PADDING * 2, point.y - PADDING * 2, 90, -arc);
@@ -64,6 +68,7 @@ public class CSPie extends CSWidget {
 		gc.fillArc(innerCirclePadding, innerCirclePadding, point.x - innerCirclePadding * 2,
 				point.y - innerCirclePadding * 2, 0, (int) (MAX_VALUE * ANGLE));
 		
+		gc.setBackground(getForeground());
 		Point textPoint = getTextPoint(String.format("%d%%", goal));
 		gc.drawText(String.format("%d%%", goal), (point.x / 2) - (textPoint.x / 2), (point.y / 2) - (textPoint.y / 2), true);
 	}
@@ -83,8 +88,8 @@ public class CSPie extends CSWidget {
 	public void setValue(int value) {
 		
 		final int max = calValue(value);
-		
-		initValue();
+
+		saveValue();
 		
 		getDisplay().timerExec(10, new Runnable() {
 			
@@ -93,15 +98,15 @@ public class CSPie extends CSWidget {
 				if (goal < max){
 					goal++;
 					redraw();
-					
 					getDisplay().timerExec(10, this);
 				}
 			}
 		});
+		redraw();
 	}
 	
-	private void initValue(){
-		preValue = goal;
+	private void saveValue(){
+		preGoal = goal;
 		goal = MIN_VALUE;
 	}
 	
@@ -113,6 +118,11 @@ public class CSPie extends CSWidget {
 		} else {
 			return value;
 		}
+	}
+	
+	public void initValue(){
+		preGoal = MIN_VALUE;
+		goal = MIN_VALUE;
 	}
 
 }
