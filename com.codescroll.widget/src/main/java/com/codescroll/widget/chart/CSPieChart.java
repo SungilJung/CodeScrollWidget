@@ -23,7 +23,7 @@ public class CSPieChart extends Composite{
 		createPie();
 		createTitleLabel();
 		
-		setFont(new Font(getDisplay(), "Arial", 12, SWT.BOLD));
+		setFont(new Font(getDisplay(), "Arial", 13, SWT.BOLD));
 
 	}
 

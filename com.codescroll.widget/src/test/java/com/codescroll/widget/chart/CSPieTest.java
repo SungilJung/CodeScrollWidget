@@ -1,9 +1,5 @@
 package com.codescroll.widget.chart;
 
-import java.nio.channels.Pipe;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -46,6 +42,7 @@ public class CSPieTest {
 	private CSPie createCSPie(){
 		CSPie pie = new CSPie(shell);
 		pie.setForeground(display.getSystemColor(SWT.COLOR_DARK_GREEN));
+		pie.setBackground(display.getSystemColor(SWT.COLOR_DARK_GREEN));
 		pie.setColor(CircleKind.CURRENT_VALUE, display.getSystemColor(SWT.COLOR_DARK_GREEN));
 		pie.setFont(new Font(display, "Arial", 10, SWT.BOLD));
 		pie.setSize(50, 50);

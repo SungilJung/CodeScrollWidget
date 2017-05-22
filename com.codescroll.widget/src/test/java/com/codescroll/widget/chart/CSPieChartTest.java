@@ -25,8 +25,8 @@ public class CSPieChartTest {
 		
 		pieChart = new CSPieChart(shell, SWT.NONE);
 		pieChart.setLayoutData(new GridData(GridData.FILL_BOTH));
-		pieChart.setBackground(display.getSystemColor(SWT.COLOR_BLUE));
-		pieChart.setForeground(display.getSystemColor(SWT.COLOR_GREEN));
+		pieChart.setForeground(display.getSystemColor(SWT.COLOR_DARK_GREEN));
+		pieChart.setTitleColor(display.getSystemColor(SWT.COLOR_DARK_GREEN));
 		pieChart.setTitle("분기");
 		shell.open();
 		pieChart.setValue(100);
