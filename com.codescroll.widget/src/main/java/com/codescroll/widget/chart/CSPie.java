@@ -15,15 +15,15 @@ import com.codescroll.widget.CSWidget;
 
 public class CSPie extends CSWidget {
 
-	public static final int MAX_VALUE = 100;
-	public static final int MIN_VALUE = 0;
+	public static final float MAX_VALUE = 100.0f;
+	public static final float MIN_VALUE = 0.0f;
 
 	private final double ANGLE = 3.6;
 	private final int PADDING = 4;
 	private Map<CircleKind, Color> colorMap;
 
-	private int goal;
-	private int preGoal;
+	private float goal;
+	private float preGoal;
 	private int thickness;
 
 	public CSPie(Composite paramComposite) {
@@ -74,8 +74,10 @@ public class CSPie extends CSWidget {
 				point.y - thickness, 0, (int) (MAX_VALUE * ANGLE));
 
 		gc.setBackground(getForeground());
-		Point textPoint = getTextPoint(String.format("%d%%", goal));
-		gc.drawText(String.format("%d%%", goal), (x / 2) - (textPoint.x / 2), (y / 2) - (textPoint.y / 2), true);
+		
+		String valueTxt = getStringOfValue();
+		Point textPoint = getTextPoint(valueTxt);
+		gc.drawText(valueTxt, (x / 2) - (textPoint.x / 2), (y / 2) - (textPoint.y / 2), true);
 
 	}
 
@@ -88,6 +90,14 @@ public class CSPie extends CSWidget {
 			return new Point(x, x); 
 		} else {
 			return new Point(y, y);
+		}
+	}
+	
+	private String getStringOfValue(){
+		if(goal - (int)goal == 0){
+			return String.format("%d%%", (int)goal);
+		}else{
+			return String.format("%.2f%%", goal);
 		}
 	}
 
@@ -114,9 +124,9 @@ public class CSPie extends CSWidget {
 		this.thickness = thickness;
 	}
 
-	public void setValue(int value) {
+	public void setValue(float value) {
 
-		final int max = calValue(value);
+		final float max = calValue(value);
 
 		saveValue();
 
@@ -126,6 +136,10 @@ public class CSPie extends CSWidget {
 			public void run() {
 				if (goal < max) {
 					goal++;
+					if(goal > max){
+						goal = max;
+					}
+					
 					redraw();
 					getDisplay().timerExec(10, this);
 				}
@@ -139,7 +153,7 @@ public class CSPie extends CSWidget {
 		goal = MIN_VALUE;
 	}
 
-	private int calValue(int value) {
+	private float calValue(float value) {
 		if (value >= MAX_VALUE) {
 			return MAX_VALUE;
 		} else if (value < MIN_VALUE) {

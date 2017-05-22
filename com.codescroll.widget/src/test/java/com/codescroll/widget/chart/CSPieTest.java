@@ -22,7 +22,7 @@ public class CSPieTest {
 	private Display display;
 	private Shell shell;
 	private CSButton button;
-	private int value; 
+	private float value; 
 	
 	@Before
 	public void init(){
@@ -42,7 +42,6 @@ public class CSPieTest {
 	private CSPie createCSPie(){
 		CSPie pie = new CSPie(shell);
 		pie.setForeground(display.getSystemColor(SWT.COLOR_DARK_GREEN));
-		pie.setBackground(display.getSystemColor(SWT.COLOR_DARK_GREEN));
 		pie.setColor(CircleKind.CURRENT_VALUE, display.getSystemColor(SWT.COLOR_DARK_GREEN));
 		pie.setFont(new Font(display, "Arial", 10, SWT.BOLD));
 		pie.setSize(50, 50);
@@ -69,7 +68,7 @@ public class CSPieTest {
 
 			public void widgetSelected(SelectionEvent paramSelectionEvent) {
 				pie.setValue(value);
-				value-=10;
+				value-=10.5;
 			}
 
 			public void widgetDefaultSelected(SelectionEvent paramSelectionEvent) {
@@ -90,7 +89,7 @@ public class CSPieTest {
 
 			public void widgetSelected(SelectionEvent paramSelectionEvent) {
 				pie.setValue(value);
-				value+=10;
+				value+=10.5;
 			}
 
 			public void widgetDefaultSelected(SelectionEvent paramSelectionEvent) {

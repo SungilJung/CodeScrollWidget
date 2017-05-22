@@ -54,7 +54,7 @@ public class CSPieChart extends Composite{
 		titleLabel.setText(title);
 	}
 	
-	public void setValue(int value){
+	public void setValue(Float value){
 		checkWidget();
 		pie.setValue(value); 
 	}
