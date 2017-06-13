@@ -29,9 +29,8 @@ public class CSPieTest {
 		
 		display = new Display();
 		shell = new Shell(display);
-		shell.setLayout(new GridLayout(2, false));
-		shell.setSize(200, 200);
-		
+		shell.setLayout(new GridLayout(1, false));
+		shell.setSize(500, 300);
 		pie = createCSPie();
 		button = createButton(shell, CSButton.SEPARATOR_SLASH, ColorThemeFactory.THEME_PURPLE, true);;
 		
@@ -44,17 +43,17 @@ public class CSPieTest {
 		pie.setForeground(display.getSystemColor(SWT.COLOR_DARK_GREEN));
 		pie.setColor(CircleKind.CURRENT_VALUE, display.getSystemColor(SWT.COLOR_DARK_GREEN));
 		pie.setFont(new Font(display, "Arial", 10, SWT.BOLD));
-		pie.setSize(50, 50);
-		
+		pie.setLayoutData(new GridData(GridData.FILL_BOTH));
 		return pie;
 	}
 	
 	private CSButton createButton(Composite composite , int type , int colorTheme, boolean border) {
+
 		CSButton button = new CSButton(composite,type, ColorThemeFactory.getColorTheme(colorTheme));
 		button.setBorder(border);
 		button.setButtonImage(new Image(null,
 				CSButton.class.getClassLoader().getResourceAsStream("com/codescroll/widget/button/ButtonImage2.png")));
-		button.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		button.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER| GridData.GRAB_HORIZONTAL));
 		button.setButtonText("테스트 실행");
 		
 		
