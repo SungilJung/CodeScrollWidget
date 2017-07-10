@@ -22,13 +22,14 @@ public abstract class CSWidget extends Canvas {
 	public static final int SEPARATOR_SLASH = 2;
 
 	protected int mouseState = SWT.MouseExit;
+//	private Set<SelectionListener> selectionListeners = new HashSet<SelectionListener>();
 
 	public CSWidget(Composite paramComposite) {
 		super(paramComposite, SWT.DOUBLE_BUFFERED);
 		addListeners();
 	}
 
-	public void addListeners() {
+	protected void addListeners() {
 		this.addListener(SWT.MouseExit, new Listener() {
 
 			public void handleEvent(Event paramEvent) {
@@ -45,6 +46,7 @@ public abstract class CSWidget extends Canvas {
 				redraw();
 			}
 		});
+		
 		this.addListener(SWT.MouseUp, new Listener() {
 
 			public void handleEvent(Event paramEvent) {
@@ -75,6 +77,9 @@ public abstract class CSWidget extends Canvas {
 			}
 		});
 	}
-
+//	public void addSelectionListener(SelectionListener selectionListener) {
+//		selectionListeners.add(selectionListener);
+//	}
+	
 	protected abstract void drawWidget(GC gc);
 }

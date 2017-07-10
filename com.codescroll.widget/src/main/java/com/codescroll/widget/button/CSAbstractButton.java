@@ -13,8 +13,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 import com.codescroll.widget.CSWidget;
-import com.codescroll.widget.ColorConfig;
-import com.codescroll.widget.ColorThemeFactory;
 
 /**
  * @author pmg
@@ -24,34 +22,19 @@ abstract class CSAbstractButton extends CSWidget {
 
 	public static final int IMAGE_SIZE = 16;
 	private Set<SelectionListener> listeners;
-	protected ColorConfig colorConfig;
+	
 	protected Image buttonImage;
 	protected String buttonText;
 	protected boolean isBorder = false;
 
 	public CSAbstractButton(Composite parent) {
-		this(parent, null, null, null);
-	}
-	
-	public CSAbstractButton(Composite parent, ColorConfig colorConfig) {
-		this(parent, colorConfig, null, null);
+		this(parent, null, null);
 	}
 	
 	public CSAbstractButton(Composite parent, Image buttonImage, String buttonText) {
-		this(parent, null, buttonImage, buttonText);
-	}
-	
-	public CSAbstractButton(Composite parent, ColorConfig colorConfig, Image buttonImage, String buttonText) {
 		super(parent);
-		
 		this.buttonImage = buttonImage;
 		this.buttonText = buttonText;
-		
-		if (colorConfig != null) {
-			this.colorConfig = colorConfig;
-		} else {
-			this.colorConfig = ColorThemeFactory.getColorTheme(ColorThemeFactory.THEME_DEFAULT);
-		}
 	}
 
 	@Override
@@ -60,7 +43,7 @@ abstract class CSAbstractButton extends CSWidget {
 		addListener(SWT.MouseUp, new Listener() {
 
 			public void handleEvent(Event paramEvent) {
-				if (listeners != null) {
+				if (listeners != null && paramEvent.button == 1) {
 					for (SelectionListener selectionListener : listeners) {
 						SelectionEvent selectionEvent = new SelectionEvent(paramEvent);
 						selectionListener.widgetSelected(selectionEvent);
@@ -101,14 +84,6 @@ abstract class CSAbstractButton extends CSWidget {
 
 	public boolean isBorder() {
 		return isBorder;
-	}
-	
-	public ColorConfig getButtonColorConfig() {
-		return colorConfig;
-	}
-	
-	public void setButtonColorConfig(ColorConfig colorConfig) {
-		this.colorConfig = colorConfig;
 	}
 	
 	public void setBorder(boolean isBorder) {
