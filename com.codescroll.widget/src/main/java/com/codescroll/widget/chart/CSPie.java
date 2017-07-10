@@ -85,12 +85,9 @@ public class CSPie extends CSWidget {
 		Point point = getSize();
 		int x = point.x - PADDING;
 		int y = point.y - PADDING;
+		int value = Math.min(x, y);
 
-		if (x < y) {
-			return new Point(x, x); 
-		} else {
-			return new Point(y, y);
-		}
+		return new Point(value, value);
 	}
 	
 	private String getStringOfValue(){
