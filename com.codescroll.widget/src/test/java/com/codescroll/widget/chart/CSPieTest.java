@@ -10,6 +10,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -74,11 +75,6 @@ public class CSPieTest {
 
 			}
 		});
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch())
-				display.sleep();
-		}
-		display.dispose();
 	}
 	
 	@Test
@@ -96,6 +92,10 @@ public class CSPieTest {
 			}
 		});
 		
+	}
+	
+	@After
+	public void after() {
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch())
 				display.sleep();
