@@ -38,8 +38,8 @@ public class CSPieChartTest {
 			
 			pieChartArr[i] = new CSPieChart(shell, SWT.NONE);
 			pieChartArr[i].setLayoutData(new GridData(GridData.FILL_BOTH));
-			pieChartArr[i].setForeground(display.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
-			pieChartArr[i].setTitleColor(display.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
+			pieChartArr[i].setForeground(display.getSystemColor(SWT.COLOR_GRAY));
+			pieChartArr[i].setTitleColor(display.getSystemColor(SWT.COLOR_GRAY));
 			pieChartArr[i].setTitle(titleArr[i]);
 			pieChartArr[i].setValue(valueArr[i]);
 		}
