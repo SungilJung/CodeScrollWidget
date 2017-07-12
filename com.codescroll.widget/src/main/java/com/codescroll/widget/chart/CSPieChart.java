@@ -84,6 +84,10 @@ public class CSPieChart extends Composite{
 		titleLabel.setForeground(color);
 	}
 	
+	public void setPieColor(CircleKind kind, Color color){
+		pie.setColor(kind, color);
+	}
+	
 	@Override
 	public void setLayout(Layout layout) {
 	}

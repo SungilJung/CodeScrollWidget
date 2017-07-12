@@ -9,6 +9,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.codescroll.widget.util.SWTGraphicUtil;
+
 public class CSPieChartTest {
 
 	private Display display;
@@ -42,6 +44,7 @@ public class CSPieChartTest {
 			pieChartArr[i].setTitleColor(display.getSystemColor(SWT.COLOR_GRAY));
 			pieChartArr[i].setTitle(titleArr[i]);
 			pieChartArr[i].setValue(valueArr[i]);
+			pieChartArr[i].setPieColor(CircleKind.CURRENT_VALUE, SWTGraphicUtil.getColorSafely(200+i, 156 + i*10, 120 + i*20));;
 		}
 
 	}
