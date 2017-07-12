@@ -60,7 +60,7 @@ public class CSPie extends CSWidget {
 
 		gc.setAntialias(SWT.ON);
 
-		gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
+		gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_GRAY));
 		gc.fillArc((x - point.x) / 2, (y - point.y) / 2, point.x, point.y, 0, (int) (MAX_VALUE * ANGLE));
 
 		gc.setBackground(colorMap.get(CircleKind.PREVIOUS_VALUE));
