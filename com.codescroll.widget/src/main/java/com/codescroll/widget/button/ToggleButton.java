@@ -11,6 +11,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.hamcrest.CoreMatchers;
@@ -23,11 +24,19 @@ public class ToggleButton extends CSAbstractButton {
 		LEFT, RIGHT
 	}
 
-	private static final int TXT_ARR_SIZE = 2;
-	private static final int HORIZONTAL_SPACING = 5;
+	private final int TXT_ARR_SIZE = 2;
+	private final int HORIZONTAL_SPACING = 5;
+	private final int MARGIN = 10;
+	private final int BORDER_MARGIN = 3;
+	private final int TOGGLE_BORDER_MARGIN = 3;
+	private final int MIN_WIDTH = 60;
+	private final int ANGLE = 360;
 
-	private Color border;
+	private Color borderColor;
 	private Color unSelectedColor;
+	private Color selectionColor;
+	private Color selectionBordoerColor;
+
 	private String[] toggleTexts = new String[TXT_ARR_SIZE];
 	private int selectionIndex;
 
@@ -35,11 +44,11 @@ public class ToggleButton extends CSAbstractButton {
 		super(parent);
 		init();
 	}
-	
+
 	private void init() {
 		this.selectionIndex = 0;
 		toggleTexts = new String[] { "", "" };
-		border = SWTGraphicUtil.getColorSafely(231, 230, 230);
+		borderColor = SWTGraphicUtil.getColorSafely(231, 230, 230);
 		unSelectedColor = SWTGraphicUtil.getColorSafely(208, 206, 206);
 	}
 
@@ -49,7 +58,6 @@ public class ToggleButton extends CSAbstractButton {
 		gc.setTextAntialias(SWT.ON);
 
 		Canvas canvas = this;
-
 		int x = canvas.getBounds().width;
 		int y = canvas.getBounds().height;
 
@@ -57,12 +65,44 @@ public class ToggleButton extends CSAbstractButton {
 		String rightText = toggleTexts[Position.RIGHT.ordinal()];
 
 		Point leftExtent = gc.textExtent(leftText);
-		int roundRectangleHeight =leftExtent.y;
+		Point rightExtent = gc.textExtent(rightText);
 
+		gc.setBackground(getBackground());
+		gc.setForeground(getSelectionFontColor(Position.LEFT.ordinal()));
 		gc.drawText(leftText, 0, y / 2 - leftExtent.y / 2);
-		gc.setBackground(border);
-		gc.fillRoundRectangle(leftExtent.x + HORIZONTAL_SPACING, y / 2 - roundRectangleHeight / 2, roundRectangleHeight * 2,
-				roundRectangleHeight, roundRectangleHeight, roundRectangleHeight);
+
+		gc.setBackground(borderColor);
+		int borderRectangleWidth = x - (leftExtent.x + rightExtent.x + (HORIZONTAL_SPACING) * 2);
+		borderRectangleWidth = Math.max(borderRectangleWidth, (y - (MARGIN + BORDER_MARGIN)) * 2);
+		gc.fillRoundRectangle(leftExtent.x + HORIZONTAL_SPACING, MARGIN, borderRectangleWidth, y - (MARGIN * 2),
+				y - MARGIN, y - MARGIN);
+
+		gc.setBackground(unSelectedColor);
+		gc.fillRoundRectangle(leftExtent.x + HORIZONTAL_SPACING + BORDER_MARGIN, MARGIN + BORDER_MARGIN,
+				borderRectangleWidth - BORDER_MARGIN * 2, y - (MARGIN + BORDER_MARGIN) * 2,
+				y - (MARGIN + BORDER_MARGIN), y - (MARGIN + BORDER_MARGIN));
+
+		gc.setBackground(selectionBordoerColor);
+		gc.fillArc(leftExtent.x + HORIZONTAL_SPACING, MARGIN - BORDER_MARGIN, y - (MARGIN + BORDER_MARGIN), y - (MARGIN + BORDER_MARGIN), 0, ANGLE);
+
+		gc.setBackground(selectionColor);
+		gc.fillArc(leftExtent.x + HORIZONTAL_SPACING + TOGGLE_BORDER_MARGIN, MARGIN - BORDER_MARGIN + TOGGLE_BORDER_MARGIN, y - (MARGIN + BORDER_MARGIN + TOGGLE_BORDER_MARGIN * 2), y - (MARGIN + BORDER_MARGIN + TOGGLE_BORDER_MARGIN * 2), 0, ANGLE);
+
+		
+		gc.setBackground(getBackground());
+		int rightTextX = leftExtent.x + borderRectangleWidth + HORIZONTAL_SPACING * 2;
+		rightTextX = Math.max(rightTextX, x - rightExtent.x);
+		gc.setForeground(getSelectionFontColor(Position.RIGHT.ordinal()));
+		gc.drawText(rightText, rightTextX, y / 2 - leftExtent.y / 2);
+
+	}
+
+	private Color getSelectionFontColor(int index) {
+		Color color = getForeground();
+		if (selectionIndex != index) {
+			color = unSelectedColor;
+		}
+		return color;
 	}
 
 	public void setText(Position position, String text) {
@@ -115,6 +155,21 @@ public class ToggleButton extends CSAbstractButton {
 	 */
 	public String getSelectionText() {
 		return toggleTexts[selectionIndex];
+	}
+
+	public void setToggleColor(Color color) {
+		int max = 255;
+		int red = Math.min(color.getRed() + 40, max);
+		int green = Math.min(color.getGreen() + 40, max);
+		int blue = Math.min(color.getBlue() + 40, max);
+
+		selectionColor = SWTGraphicUtil.getColorSafely(color.getRed(), color.getGreen(), color.getBlue());
+		selectionBordoerColor = SWTGraphicUtil.getColorSafely(red, green, blue);
+	}
+
+	@Override
+	public void setSize(int width, int height) {
+		super.setSize(Math.max(width, MIN_WIDTH), height);
 	}
 
 }

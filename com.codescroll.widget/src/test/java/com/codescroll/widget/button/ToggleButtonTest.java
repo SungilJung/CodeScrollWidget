@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.codescroll.widget.button.ToggleButton.Position;
+import com.codescroll.widget.util.SWTGraphicUtil;
 
 public class ToggleButtonTest {
 	
@@ -25,7 +26,7 @@ public class ToggleButtonTest {
 		display = new Display();
 		shell = new Shell(display);
 		shell.setLayout(new GridLayout(1, false));
-		shell.setSize(500, 300);
+		shell.setSize(230, 105);
 		toggle = createToggleButton();
 		
 		shell.open();
@@ -35,11 +36,12 @@ public class ToggleButtonTest {
 	private ToggleButton createToggleButton() {
 		ToggleButton toggle = new ToggleButton(shell);
 		
+		Color color = SWTGraphicUtil.getColorSafely(193, 141, 34);
 		toggle.setText(Position.LEFT, "호스트");
-		toggle.setText(Position.LEFT, "타깃");
-		toggle.setBackground(display.getSystemColor(SWT.COLOR_GRAY));
-		toggle.setForeground(display.getSystemColor(SWT.COLOR_DARK_YELLOW));
-		toggle.setFont(new Font(display, "Arial", 10, SWT.BOLD));
+		toggle.setText(Position.RIGHT, "타깃");
+		toggle.setForeground(color);
+		toggle.setToggleColor(color);
+		toggle.setFont(new Font(display, "Arial", 15, SWT.BOLD));
 		toggle.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		return toggle;
