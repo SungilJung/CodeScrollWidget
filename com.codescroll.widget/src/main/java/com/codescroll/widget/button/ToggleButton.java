@@ -2,19 +2,19 @@ package com.codescroll.widget.button;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.hamcrest.CoreMatchers;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 import com.codescroll.widget.util.SWTGraphicUtil;
 
@@ -67,34 +67,42 @@ public class ToggleButton extends CSAbstractButton {
 		Point leftExtent = gc.textExtent(leftText);
 		Point rightExtent = gc.textExtent(rightText);
 
-		gc.setBackground(getBackground());
+		int borderRectangleX = leftExtent.x + HORIZONTAL_SPACING;
+		int borderRectangleWidth = x - (leftExtent.x + rightExtent.x + (HORIZONTAL_SPACING) * 2);
+		borderRectangleWidth = Math.max(borderRectangleWidth, (y - (MARGIN + BORDER_MARGIN)) + 20);
+
+		int rightTextX = leftExtent.x + borderRectangleWidth + HORIZONTAL_SPACING * 2;
+		rightTextX = Math.max(rightTextX, x - rightExtent.x);
+
+		int circleDiameter = y - (MARGIN + BORDER_MARGIN);
+		int circleX = getCirclePointX(borderRectangleX, borderRectangleWidth, circleDiameter);
+
 		gc.setForeground(getSelectionFontColor(Position.LEFT.ordinal()));
-		gc.drawText(leftText, 0, y / 2 - leftExtent.y / 2);
+		gc.drawText(leftText, 0, y / 2 - leftExtent.y / 2, true);
 
 		gc.setBackground(borderColor);
-		int borderRectangleWidth = x - (leftExtent.x + rightExtent.x + (HORIZONTAL_SPACING) * 2);
-		borderRectangleWidth = Math.max(borderRectangleWidth, (y - (MARGIN + BORDER_MARGIN)) * 2);
-		gc.fillRoundRectangle(leftExtent.x + HORIZONTAL_SPACING, MARGIN, borderRectangleWidth, y - (MARGIN * 2),
-				y - MARGIN, y - MARGIN);
+		gc.fillRoundRectangle(borderRectangleX, MARGIN, borderRectangleWidth, y - (MARGIN * 2), y - MARGIN, y - MARGIN);
 
 		gc.setBackground(unSelectedColor);
-		gc.fillRoundRectangle(leftExtent.x + HORIZONTAL_SPACING + BORDER_MARGIN, MARGIN + BORDER_MARGIN,
+		gc.fillRoundRectangle(borderRectangleX + BORDER_MARGIN, MARGIN + BORDER_MARGIN,
 				borderRectangleWidth - BORDER_MARGIN * 2, y - (MARGIN + BORDER_MARGIN) * 2,
 				y - (MARGIN + BORDER_MARGIN), y - (MARGIN + BORDER_MARGIN));
 
-		gc.setBackground(selectionBordoerColor);
-		gc.fillArc(leftExtent.x + HORIZONTAL_SPACING, MARGIN - BORDER_MARGIN, y - (MARGIN + BORDER_MARGIN), y - (MARGIN + BORDER_MARGIN), 0, ANGLE);
+		drawCircle(gc, circleX, circleDiameter);
 
-		gc.setBackground(selectionColor);
-		gc.fillArc(leftExtent.x + HORIZONTAL_SPACING + TOGGLE_BORDER_MARGIN, MARGIN - BORDER_MARGIN + TOGGLE_BORDER_MARGIN, y - (MARGIN + BORDER_MARGIN + TOGGLE_BORDER_MARGIN * 2), y - (MARGIN + BORDER_MARGIN + TOGGLE_BORDER_MARGIN * 2), 0, ANGLE);
-
-		
-		gc.setBackground(getBackground());
-		int rightTextX = leftExtent.x + borderRectangleWidth + HORIZONTAL_SPACING * 2;
-		rightTextX = Math.max(rightTextX, x - rightExtent.x);
 		gc.setForeground(getSelectionFontColor(Position.RIGHT.ordinal()));
-		gc.drawText(rightText, rightTextX, y / 2 - leftExtent.y / 2);
+		gc.drawText(rightText, rightTextX, y / 2 - leftExtent.y / 2, true);
 
+	}
+
+	private int getCirclePointX(int borderRectangleX, int borderRectangleWidth, int circleDiameter) {
+		int circleX;
+		if (selectionIndex == Position.LEFT.ordinal()) {
+			circleX = borderRectangleX;
+		} else {
+			circleX = borderRectangleX + borderRectangleWidth - circleDiameter;
+		}
+		return circleX;
 	}
 
 	private Color getSelectionFontColor(int index) {
@@ -103,6 +111,18 @@ public class ToggleButton extends CSAbstractButton {
 			color = unSelectedColor;
 		}
 		return color;
+	}
+
+	private void drawCircle(GC gc, int x, int y) {
+
+		int borderY = MARGIN - BORDER_MARGIN;
+
+		gc.setBackground(selectionBordoerColor);
+		gc.fillArc(x, borderY, y, y, 0, ANGLE);
+
+		gc.setBackground(selectionColor);
+		gc.fillArc(x + TOGGLE_BORDER_MARGIN, MARGIN - BORDER_MARGIN + TOGGLE_BORDER_MARGIN,
+				y - TOGGLE_BORDER_MARGIN * 2, y - TOGGLE_BORDER_MARGIN * 2, 0, ANGLE);
 	}
 
 	public void setText(Position position, String text) {
@@ -170,6 +190,28 @@ public class ToggleButton extends CSAbstractButton {
 	@Override
 	public void setSize(int width, int height) {
 		super.setSize(Math.max(width, MIN_WIDTH), height);
+	}
+
+	@Override
+	public void addListeners() {
+		super.addListeners();
+
+		addListener(SWT.MouseUp, new Listener() {
+
+			public void handleEvent(Event paramEvent) {
+				int halfWidth = ToggleButton.this.getParent().getBounds().width / 2;
+				Set<SelectionListener> listeners = getListeners();
+
+				if (listeners != null && paramEvent.button == 1) {
+					if (halfWidth <= paramEvent.x) {
+						selectionIndex = Position.RIGHT.ordinal();
+					} else {
+						selectionIndex = Position.LEFT.ordinal();
+					}
+					redraw();
+				}
+			}
+		});
 	}
 
 }

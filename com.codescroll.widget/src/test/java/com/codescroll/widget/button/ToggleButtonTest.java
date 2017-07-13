@@ -1,6 +1,8 @@
 package com.codescroll.widget.button;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
@@ -41,8 +43,22 @@ public class ToggleButtonTest {
 		toggle.setText(Position.RIGHT, "타깃");
 		toggle.setForeground(color);
 		toggle.setToggleColor(color);
-		toggle.setFont(new Font(display, "Arial", 15, SWT.BOLD));
+		toggle.setBackground(display.getSystemColor(SWT.COLOR_GRAY));
+		toggle.setFont(new Font(display, "Arial", 10, SWT.BOLD));
 		toggle.setLayoutData(new GridData(GridData.FILL_BOTH));
+		toggle.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				System.out.println("hi");
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		
 		return toggle;
 	}

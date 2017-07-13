@@ -97,6 +97,10 @@ abstract class CSAbstractButton extends CSWidget {
 		}
 	}
 
+	protected Set<SelectionListener> getListeners() {
+		return listeners;
+	}
+
 	@Override
 	public void dispose() {
 		super.dispose();
