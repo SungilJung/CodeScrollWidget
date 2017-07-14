@@ -28,7 +28,7 @@ public class ToggleButtonTest {
 		display = new Display();
 		shell = new Shell(display);
 		shell.setLayout(new GridLayout(2, false));
-		shell.setSize(610, 200);
+		shell.setSize(230, 200);
 		toggle = createToggleButton();
 		toggle.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
 		
@@ -44,12 +44,12 @@ public class ToggleButtonTest {
 		toggle.setText(Position.RIGHT, "타깃");
 		toggle.setForeground(color);
 		toggle.setToggleColor(color);
-		toggle.setFont(new Font(display, "Arial", 55, SWT.BOLD));
+		toggle.setFont(new Font(display, "Arial", 18, SWT.BOLD));
 		toggle.addSelectionListener(new SelectionListener() {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				System.out.println("hi");
+				System.out.println(((ToggleButton)e.widget).getSelectionText());
 			}
 			
 			@Override
