@@ -100,10 +100,11 @@ public class CSPie extends CSWidget {
 
 	private Point getTextPoint(String str) {
 		GC tempGC = new GC(this);
+		tempGC.setAntialias(SWT.ON);
+		tempGC.setFont(getFont());
 		Point stringExtent = tempGC.stringExtent(str);
 		tempGC.dispose();
 		return stringExtent;
-
 	}
 
 	public void setColor(CircleKind kind, Color color) {
