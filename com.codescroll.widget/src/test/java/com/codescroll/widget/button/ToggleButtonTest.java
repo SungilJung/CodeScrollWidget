@@ -27,9 +27,10 @@ public class ToggleButtonTest {
 		
 		display = new Display();
 		shell = new Shell(display);
-		shell.setLayout(new GridLayout(1, false));
-		shell.setSize(230, 105);
+		shell.setLayout(new GridLayout(2, false));
+		shell.setSize(200, 500);
 		toggle = createToggleButton();
+		toggle.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
 		
 		shell.open();
 		
@@ -43,9 +44,7 @@ public class ToggleButtonTest {
 		toggle.setText(Position.RIGHT, "타깃");
 		toggle.setForeground(color);
 		toggle.setToggleColor(color);
-		toggle.setBackground(display.getSystemColor(SWT.COLOR_GRAY));
-		toggle.setFont(new Font(display, "Arial", 10, SWT.BOLD));
-		toggle.setLayoutData(new GridData(GridData.FILL_BOTH));
+		toggle.setFont(new Font(display, "Arial", 55, SWT.BOLD));
 		toggle.addSelectionListener(new SelectionListener() {
 			
 			@Override
