@@ -28,7 +28,7 @@ public class ToggleButtonTest {
 		display = new Display();
 		shell = new Shell(display);
 		shell.setLayout(new GridLayout(2, false));
-		shell.setSize(200, 500);
+		shell.setSize(610, 200);
 		toggle = createToggleButton();
 		toggle.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
 		
