@@ -44,7 +44,7 @@ public class ToggleButtonTest {
 		toggle.setText(Position.RIGHT, "타깃");
 		toggle.setForeground(color);
 		toggle.setToggleColor(color);
-		toggle.setFont(new Font(display, "Arial", 18, SWT.BOLD));
+		toggle.setFont(new Font(display, "Arial", 10, SWT.BOLD));
 		toggle.addSelectionListener(new SelectionListener() {
 			
 			@Override
