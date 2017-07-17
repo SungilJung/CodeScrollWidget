@@ -307,7 +307,7 @@ public class CSPie extends CSWidget {
 					
 					@Override
 					public void run() {
-						if(preStateAlpha != MIN_ALPHA) {
+						if(preStateAlpha != MIN_ALPHA && preState != 0) {
 							preStateAlpha-=20;
 							if(preStateAlpha < MIN_ALPHA) {
 								preStateAlpha = MIN_ALPHA;
