@@ -52,9 +52,10 @@ public class CSPie extends CSWidget {
 		setPreStateAlpha(DEFAULT_ALPHA);
 	}
 
-	private void initState() {
+	public void initState() {
 		preState = MIN_STATE;
 		state = MIN_STATE;
+		isCalculate = false;
 	}
 
 	private void initColor() {

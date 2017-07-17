@@ -95,6 +95,23 @@ public class CSPieTest {
 		});
 
 	}
+	
+	@Test
+	public void drawValueInitTest() {
+		value = 50;
+		button.addSelectionListener(new SelectionListener() {
+
+			public void widgetSelected(SelectionEvent paramSelectionEvent) {
+				pie.initState();
+				pie.setValue(50);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent paramSelectionEvent) {
+
+			}
+		});
+
+	}
 
 	@After
 	public void after() {
