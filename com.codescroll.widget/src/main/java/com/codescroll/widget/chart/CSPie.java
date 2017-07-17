@@ -15,6 +15,7 @@ public class CSPie extends CSWidget {
 
 	private static final int SHADOW_ALPHA = 120;
 	private static final int DEFAULT_ALPHA = 255;
+	private static final int MIN_ALPHA = 0;
 
 	public static final float MAX_STATE = 100.0f;
 	public static final float MIN_STATE = 0.0f;
@@ -35,6 +36,7 @@ public class CSPie extends CSWidget {
 	private float preState;
 	private int outerThickness;
 	private int innerThickness;
+	private int preStateAlpha;
 	private boolean isCalculate;
 
 	public CSPie(Composite paramComposite) {
@@ -47,6 +49,7 @@ public class CSPie extends CSWidget {
 		initColor();
 		initFont();
 		setThickness(DEFAULT_THICKNESS);
+		setPreStateAlpha(DEFAULT_ALPHA);
 	}
 
 	private void initState() {
@@ -80,7 +83,7 @@ public class CSPie extends CSWidget {
 		setFont(new Font(getDisplay(), "Arial", 12, SWT.BOLD));
 	}
 
-	public void setThickness(int thickness) {
+	private void setThickness(int thickness) {
 
 		int outerThickness = thickness;
 		if (outerThickness < 4) {
@@ -90,8 +93,14 @@ public class CSPie extends CSWidget {
 		}
 
 		this.outerThickness = outerThickness;
-		this.innerThickness = outerThickness - 5;
+		this.innerThickness = outerThickness - 5 < 1 ? 1 : outerThickness - 5;
+		
 	}
+	
+	private void setPreStateAlpha(int alpha) {
+		preStateAlpha = alpha;
+	}
+	
 
 	@Override
 	protected void drawWidget(GC gc) {
@@ -124,6 +133,20 @@ public class CSPie extends CSWidget {
 		}
 		Point preTextPoint = getTextPoint(preValueTxt, preTextFont);
 
+		int shadowAlpha;
+		int innerCircleAlpha ;
+		int preTextAlpha;
+		
+		if(preStateAlpha == DEFAULT_ALPHA) {
+			shadowAlpha = SHADOW_ALPHA;
+			innerCircleAlpha = DEFAULT_ALPHA;
+			preTextAlpha = DEFAULT_ALPHA;
+		}else {
+			shadowAlpha = preStateAlpha;
+			innerCircleAlpha = preStateAlpha;
+			preTextAlpha = preStateAlpha;
+		}
+		
 		// draw outerCircle
 		gc.setAlpha(SHADOW_ALPHA);
 		gc.setBackground(outerShadowColor);
@@ -136,32 +159,38 @@ public class CSPie extends CSWidget {
 		gc.setBackground(getBackground());
 		gc.fillArc(innerCircleX / 2, innerCircleY / 2, innerCircleWidth, innerCircleHeight, 0,
 				(int) (MAX_STATE * ANGLE));
-
+		
 		// draw innerCircle
-		if (preState > 0 && preState < 100.0) {
-			gc.setAlpha(SHADOW_ALPHA);
+		if (preState != 0) {
+			gc.setAlpha(shadowAlpha);
 			gc.setBackground(innerShadowColor);
 			gc.fillArc(innerCircleX / 2, innerCircleY / 2, innerCircleWidth, innerCircleHeight, 0,
 					(int) (MAX_STATE * ANGLE));
 
-			gc.setAlpha(DEFAULT_ALPHA);
+			gc.setAlpha(innerCircleAlpha);
 			gc.setBackground(innerColor);
 			gc.fillArc(innerCircleX / 2, innerCircleY / 2, innerCircleWidth, innerCircleHeight, 90, -preArc);
-
+			
+			gc.setAlpha(DEFAULT_ALPHA);
 			gc.setBackground(getBackground());
 			gc.fillArc((innerCircleX + innerThickness) / 2, (innerCircleY + innerThickness) / 2,
 					innerCircleWidth - innerThickness, innerCircleHeight - innerThickness, 0,
 					(int) (MAX_STATE * ANGLE));
 		}
 
+		
 		// draw text
+		
 		gc.setForeground(getForeground());
-
-		if (preState > 0 && value != 0  && preState < 100.0) {
+		
+		if (preState != 0) {
+			gc.setAlpha(DEFAULT_ALPHA);
 			gc.drawText(valueTxt, (x / 2) - (textPoint.x / 2), (y / 2) - (textPoint.y / 2), true);
 			gc.setFont(preTextFont);
+			gc.setAlpha(preTextAlpha);
 			gc.drawText(preValueTxt, (x / 2) - (preTextPoint.x / 2), (y / 2) + (preTextPoint.y), true);
 		} else {
+			gc.setAlpha(DEFAULT_ALPHA);
 			gc.drawText(valueTxt, (x / 2) - (textPoint.x / 2), (y / 2) - (textPoint.y / 2), true);
 		}
 	}
@@ -225,7 +254,8 @@ public class CSPie extends CSWidget {
 		if (isCalculate) {
 			return;
 		}
-
+		
+		preStateAlpha = DEFAULT_ALPHA;
 		final float preGoal = state;
 		final float goal = getGoal(value);
 		final int[] milliseconds = new int[] { 5 };
@@ -244,14 +274,14 @@ public class CSPie extends CSWidget {
 				if (state != goal || preState != preGoal) {
 					isCalculate = true;
 
-					if (state < goal) {
+					if (state != goal) {
 						state++;
 						if (state > goal) {
 							state = goal;
 						}
 					}
 
-					if (preState < preGoal) {
+					if (preState != preGoal) {
 						preState += 2;
 						if (preState > preGoal) {
 							preState = preGoal;
@@ -267,8 +297,31 @@ public class CSPie extends CSWidget {
 						getDisplay().timerExec(milliseconds[0], this);
 					}
 				} else {
-					isCalculate = false;
+					drawTransparentCircle();
 				}
+			}
+
+			private void drawTransparentCircle() {
+				getDisplay().timerExec(100, new Runnable() {
+					
+					@Override
+					public void run() {
+						if(preStateAlpha != MIN_ALPHA) {
+							preStateAlpha-=20;
+							if(preStateAlpha < MIN_ALPHA) {
+								preStateAlpha = MIN_ALPHA;
+							}
+							
+							if (!CSPie.this.isDisposed()) {
+								redraw();
+								getDisplay().timerExec(100, this);
+							}
+							
+						}else {
+							isCalculate = false;
+						}
+					}
+				});
 			}
 		});
 	}

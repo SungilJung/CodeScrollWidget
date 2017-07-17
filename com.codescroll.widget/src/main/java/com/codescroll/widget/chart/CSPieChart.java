@@ -95,7 +95,4 @@ public class CSPieChart extends Composite{
 	public void setLayout(Layout layout) {
 	}
 	
-	public void setThickness(int thickness){
-		pie.setThickness(thickness);
-	}
 }
