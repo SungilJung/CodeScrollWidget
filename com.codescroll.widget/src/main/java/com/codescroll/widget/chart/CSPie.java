@@ -29,13 +29,13 @@ public class CSPie extends CSWidget {
 	private Color outerShadowColor;
 	private Color innerColor;
 	private Color innerShadowColor;
+	private Font preTextFont;
 
 	private float state;
 	private float preState;
 	private int outerThickness;
 	private int innerThickness;
 	private boolean isCalculate;
-	
 
 	public CSPie(Composite paramComposite) {
 		super(paramComposite);
@@ -53,7 +53,7 @@ public class CSPie extends CSWidget {
 		preState = MIN_STATE;
 		state = MIN_STATE;
 	}
-	
+
 	private void initColor() {
 		outerColor = SWTGraphicUtil.getColorSafely(193, 141, 34);
 		outerShadowColor = getShadowColor(outerColor);
@@ -79,7 +79,7 @@ public class CSPie extends CSWidget {
 	private void initFont() {
 		setFont(new Font(getDisplay(), "Arial", 12, SWT.BOLD));
 	}
-	
+
 	public void setThickness(int thickness) {
 
 		int outerThickness = thickness;
@@ -92,7 +92,7 @@ public class CSPie extends CSWidget {
 		this.outerThickness = outerThickness;
 		this.innerThickness = outerThickness - 5;
 	}
-	
+
 	@Override
 	protected void drawWidget(GC gc) {
 		gc.setAntialias(SWT.ON);
@@ -111,6 +111,19 @@ public class CSPie extends CSWidget {
 		int innerCircleWidth = circlePoint.x - outerThickness;
 		int innerCircleHeight = circlePoint.y - outerThickness;
 
+		String valueTxt = getStringOfValue();
+		Point textPoint = getTextPoint(valueTxt, getFont());
+		float value;
+		String preValueTxt;
+		if (preState > state) {
+			value = preState - state;
+			preValueTxt = "(-" + String.format("%.1f%%", value) + ")";
+		} else {
+			value = state - preState;
+			preValueTxt = "(+" + String.format("%.1f%%", value) + ")";
+		}
+		Point preTextPoint = getTextPoint(preValueTxt, preTextFont);
+
 		// draw outerCircle
 		gc.setAlpha(SHADOW_ALPHA);
 		gc.setBackground(outerShadowColor);
@@ -125,26 +138,32 @@ public class CSPie extends CSWidget {
 				(int) (MAX_STATE * ANGLE));
 
 		// draw innerCircle
-		gc.setAlpha(SHADOW_ALPHA);
-		gc.setBackground(innerShadowColor);
-		gc.fillArc(innerCircleX / 2, innerCircleY / 2, innerCircleWidth, innerCircleHeight, 0,
-				(int) (MAX_STATE * ANGLE));
+		if (preState > 0 && preState < 100.0) {
+			gc.setAlpha(SHADOW_ALPHA);
+			gc.setBackground(innerShadowColor);
+			gc.fillArc(innerCircleX / 2, innerCircleY / 2, innerCircleWidth, innerCircleHeight, 0,
+					(int) (MAX_STATE * ANGLE));
 
-		gc.setAlpha(DEFAULT_ALPHA);
-		gc.setBackground(innerColor);
-		gc.fillArc(innerCircleX / 2, innerCircleY / 2, innerCircleWidth, innerCircleHeight, 90, -preArc);
+			gc.setAlpha(DEFAULT_ALPHA);
+			gc.setBackground(innerColor);
+			gc.fillArc(innerCircleX / 2, innerCircleY / 2, innerCircleWidth, innerCircleHeight, 90, -preArc);
 
-		gc.setBackground(getBackground());
-		gc.fillArc((innerCircleX + innerThickness) / 2, (innerCircleY + innerThickness) / 2,
-				innerCircleWidth - innerThickness, innerCircleHeight - innerThickness, 0,
-				(int) (MAX_STATE * ANGLE));
+			gc.setBackground(getBackground());
+			gc.fillArc((innerCircleX + innerThickness) / 2, (innerCircleY + innerThickness) / 2,
+					innerCircleWidth - innerThickness, innerCircleHeight - innerThickness, 0,
+					(int) (MAX_STATE * ANGLE));
+		}
 
 		// draw text
 		gc.setForeground(getForeground());
-		String valueTxt = getStringOfValue();
-		Point textPoint = getTextPoint(valueTxt);
-		gc.drawText(valueTxt, (x / 2) - (textPoint.x / 2), (y / 2) - (textPoint.y / 2), true);
 
+		if (preState > 0 && value != 0  && preState < 100.0) {
+			gc.drawText(valueTxt, (x / 2) - (textPoint.x / 2), (y / 2) - (textPoint.y / 2), true);
+			gc.setFont(preTextFont);
+			gc.drawText(preValueTxt, (x / 2) - (preTextPoint.x / 2), (y / 2) + (preTextPoint.y), true);
+		} else {
+			gc.drawText(valueTxt, (x / 2) - (textPoint.x / 2), (y / 2) - (textPoint.y / 2), true);
+		}
 	}
 
 	private Point getCircleSize() {
@@ -152,10 +171,10 @@ public class CSPie extends CSWidget {
 		int x = point.x - PADDING;
 		int y = point.y - PADDING;
 		int value = Math.min(x, y);
-		
-		Point textPoint = getTextPoint(MAX_TEXT);
-		int diameter = Math.max(textPoint.x, textPoint.y) + 10;
-		
+
+		Point textPoint = getTextPoint(MAX_TEXT, getFont());
+		int diameter = Math.max(textPoint.x, textPoint.y) + 30;
+
 		value = Math.max(value, diameter);
 
 		return new Point(value, value);
@@ -169,17 +188,13 @@ public class CSPie extends CSWidget {
 		}
 	}
 
-	private Point getTextPoint(String str) {
+	private Point getTextPoint(String str, Font font) {
 		GC tempGC = new GC(this);
 		tempGC.setAntialias(SWT.ON);
-		tempGC.setFont(getFont());
+		tempGC.setFont(font);
 		Point stringExtent = tempGC.stringExtent(str);
 		tempGC.dispose();
 		return stringExtent;
-	}
-
-	public void setColor(CircleKind kind, Color color) {
-		// colorMap.put(kind, color);
 	}
 
 	public void setOuterCircleColor(Color color) {
@@ -191,32 +206,37 @@ public class CSPie extends CSWidget {
 		innerColor = color;
 		innerShadowColor = getShadowColor(color);
 	}
-	
+
 	@Override
 	public void setFont(Font font) {
-//		setPreTextFont(font);
+		setPreTextFont(font);
 		super.setFont(font);
 	}
 
-//	private void setPreTextFont(Font font) {
-//		FontData fontData = font.getFontData()[0];
-//		int preFontHeight = fontData.getHeight() < 2 ? fontData
-//		preTextFont = 
-//	}
+	private void setPreTextFont(Font font) {
+		FontData fontData = font.getFontData()[0];
+		int preFontHeight = fontData.getHeight() - 6;
+		preFontHeight = preFontHeight < 8 ? 8 : preFontHeight;
+		preTextFont = new Font(getDisplay(), fontData.getName(), preFontHeight, fontData.getStyle());
+	}
 
 	public void setValue(float value) {
 
-		System.out.println("isCalculate: "+ isCalculate);
-		if(isCalculate){
+		if (isCalculate) {
 			return;
 		}
-		
+
 		final float preGoal = state;
 		final float goal = getGoal(value);
 		final int[] milliseconds = new int[] { 5 };
 		initState();
 
-		
+		drawState(preGoal, goal, milliseconds);
+
+		redraw();
+	}
+
+	private void drawState(final float preGoal, final float goal, final int[] milliseconds) {
 		getDisplay().timerExec(milliseconds[0], new Runnable() {
 
 			@Override
@@ -226,20 +246,17 @@ public class CSPie extends CSWidget {
 
 					if (state < goal) {
 						state++;
-						if(state > goal){
+						if (state > goal) {
 							state = goal;
 						}
 					}
 
 					if (preState < preGoal) {
-						preState+=2;
-						if(preState > preGoal){
+						preState += 2;
+						if (preState > preGoal) {
 							preState = preGoal;
 						}
 					}
-					
-					System.out.println("Goal: " + goal + " state: "+ state +
-							" preGoal: " + preGoal + " preState: " + preState);
 
 					if (milliseconds[0] < 10) {
 						milliseconds[0] += 1;
@@ -249,13 +266,11 @@ public class CSPie extends CSWidget {
 						redraw();
 						getDisplay().timerExec(milliseconds[0], this);
 					}
-				}else{
+				} else {
 					isCalculate = false;
 				}
 			}
 		});
-		
-		redraw();
 	}
 
 	private float getGoal(float value) {
@@ -271,5 +286,5 @@ public class CSPie extends CSWidget {
 	public boolean isCalculate() {
 		return isCalculate;
 	}
-	
+
 }

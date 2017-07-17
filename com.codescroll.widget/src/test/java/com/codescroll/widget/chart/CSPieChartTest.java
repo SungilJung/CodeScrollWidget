@@ -44,7 +44,7 @@ public class CSPieChartTest {
 			pieChartArr[i].setTitleColor(display.getSystemColor(SWT.COLOR_GRAY));
 			pieChartArr[i].setTitle(titleArr[i]);
 			pieChartArr[i].setValue(valueArr[i]);
-			pieChartArr[i].setPieColor(CircleKind.CURRENT_VALUE, SWTGraphicUtil.getColorSafely(200+i, 156 + i*10, 120 + i*20));;
+			pieChartArr[i].setOuterCircleColor(SWTGraphicUtil.getColorSafely(200+i, 156 + i*10, 120 + i*20));;
 		}
 
 	}

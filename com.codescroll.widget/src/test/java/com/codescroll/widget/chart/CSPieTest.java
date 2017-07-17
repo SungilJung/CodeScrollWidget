@@ -42,8 +42,7 @@ public class CSPieTest {
 	private CSPie createCSPie() {
 		CSPie pie = new CSPie(shell);
 		pie.setForeground(display.getSystemColor(SWT.COLOR_DARK_GREEN));
-		pie.setColor(CircleKind.CURRENT_VALUE, display.getSystemColor(SWT.COLOR_DARK_GREEN));
-		pie.setFont(new Font(display, "Arial", 13, SWT.BOLD));
+		pie.setFont(new Font(display, "Arial", 12, SWT.BOLD));
 		pie.setLayoutData(new GridData(GridData.FILL_BOTH));
 		return pie;
 	}
