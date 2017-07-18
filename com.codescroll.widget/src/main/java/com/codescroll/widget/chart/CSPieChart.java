@@ -83,16 +83,16 @@ public class CSPieChart extends Composite{
 		checkWidget();
 		titleLabel.setForeground(color);
 	}
-	
-	public void setPieColor(CircleKind kind, Color color){
-		pie.setColor(kind, color);
+	public void setOuterCircleColor(Color color) {
+		pie.setOuterCircleColor(color);
+	}
+
+	public void setInnerCircleColor(Color color) {
+		pie.setInnerCircleColor(color);
 	}
 	
 	@Override
 	public void setLayout(Layout layout) {
 	}
 	
-	public void setThickness(int thickness){
-		pie.setThickness(thickness);
-	}
 }
