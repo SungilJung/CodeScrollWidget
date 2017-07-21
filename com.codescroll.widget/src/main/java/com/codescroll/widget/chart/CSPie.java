@@ -203,7 +203,7 @@ public class CSPie extends CSWidget {
 		int value = Math.min(x, y);
 
 		Point textPoint = getTextPoint(MAX_TEXT, getFont());
-		int diameter = Math.max(textPoint.x, textPoint.y) + 30;
+		int diameter = Math.max(textPoint.x, textPoint.y) + 10;
 
 		value = Math.max(value, diameter);
 
