@@ -21,7 +21,7 @@ import com.codescroll.widget.util.SWTGraphicUtil;
 
 public class CSSearchText extends Composite {
 	private static final int MARGIN_RIGHT = 3;
-	private static final int MARGIN_lEFT = 6;
+	private static final int MARGIN_lEFT = 3;
 	private static final int MARGIN_HEIGHT = 3;
 	private Composite composite;
 	private CSSearchButton searchButton;
@@ -55,8 +55,8 @@ public class CSSearchText extends Composite {
 				} else {
 					gc.setForeground(focusOut);
 				}
-                gc.fillRoundRectangle(2, 2, bounds.width - 4, bounds.height - 4, 25, 25);
-                gc.drawRoundRectangle(1, 1, bounds.width - 2, bounds.height - 2, 25, 25);
+                gc.fillRoundRectangle(2, 2, bounds.width - 4, bounds.height - 4, 10, 10);
+                gc.drawRoundRectangle(1, 1, bounds.width - 2, bounds.height - 2, 10, 10);
 			}
 		});
 
