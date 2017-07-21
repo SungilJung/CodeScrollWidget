@@ -79,7 +79,7 @@ public class ToggleButton extends CSAbstractButton {
 		int circleX = getCirclePointX(borderRectangleX, borderRectangleWidth, circleDiameter);
 
 		gc.setForeground(getSelectionFontColor(Position.LEFT.ordinal()));
-		gc.drawText(leftText, 0, (height + BORDER_MARGIN) / 2 - leftExtent.y / 2, true);
+		gc.drawText(leftText, 0, (height) / 2 - leftExtent.y / 2, true);
 
 		gc.setBackground(borderColor);
 		gc.fillRoundRectangle(borderRectangleX, MARGIN, borderRectangleWidth, height - (MARGIN * 2),
@@ -93,7 +93,7 @@ public class ToggleButton extends CSAbstractButton {
 		drawCircle(gc, circleX, circleDiameter);
 
 		gc.setForeground(getSelectionFontColor(Position.RIGHT.ordinal()));
-		gc.drawText(rightText, rightTextX, (height + BORDER_MARGIN) / 2 - rightExtent.y / 2 , true);
+		gc.drawText(rightText, rightTextX, (height) / 2 - rightExtent.y / 2 , true);
 
 	}
 

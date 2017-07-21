@@ -3,6 +3,7 @@ package com.codescroll.widget.chart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -23,7 +24,7 @@ public class CSPieChart extends Composite{
 		createPie();
 		createTitleLabel();
 		
-		setFont(new Font(getDisplay(), "Arial", 13, SWT.BOLD));
+		setFont(new Font(getDisplay(), "Arial", 10, SWT.BOLD));
 
 	}
 
@@ -34,6 +35,8 @@ public class CSPieChart extends Composite{
 		layout.marginTop = 0;
 		layout.marginLeft = 0;
 		layout.marginTop = 0;
+		layout.marginWidth = 0;
+		layout.marginHeight = 0;
 		return layout;
 	}
 	
@@ -77,6 +80,14 @@ public class CSPieChart extends Composite{
 		checkWidget();
 		pie.setFont(font);
 		titleLabel.setFont(font);
+	}
+	
+	public void setFontSize(int size) {
+		checkWidget();
+		FontData fontData = getFont().getFontData()[0];
+		fontData.setHeight(size);
+		Font font = new Font(getDisplay(), fontData);
+		setFont(font);
 	}
 	
 	public void setTitleColor(Color color){
