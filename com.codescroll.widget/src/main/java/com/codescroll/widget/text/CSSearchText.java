@@ -55,9 +55,8 @@ public class CSSearchText extends Composite {
 				} else {
 					gc.setForeground(focusOut);
 				}
-				gc.fillRoundRectangle(2, 2, bounds.width - 4, bounds.height - 4, 20, 20);
-				gc.drawRoundRectangle(1, 1, bounds.width - 4, bounds.height - 4, 20, 20);
-				
+                gc.fillRoundRectangle(2, 2, bounds.width - 4, bounds.height - 4, 25, 25);
+                gc.drawRoundRectangle(1, 1, bounds.width - 2, bounds.height - 2, 25, 25);
 			}
 		});
 
