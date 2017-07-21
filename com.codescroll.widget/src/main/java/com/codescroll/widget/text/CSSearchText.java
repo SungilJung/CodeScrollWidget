@@ -12,6 +12,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
@@ -19,6 +20,9 @@ import com.codescroll.widget.button.CSSearchButton;
 import com.codescroll.widget.util.SWTGraphicUtil;
 
 public class CSSearchText extends Composite {
+	private static final int MARGIN_RIGHT = 3;
+	private static final int MARGIN_lEFT = 6;
+	private static final int MARGIN_HEIGHT = 3;
 	private Composite composite;
 	private CSSearchButton searchButton;
 	private Text text;
@@ -33,9 +37,11 @@ public class CSSearchText extends Composite {
 	}
 
 	private void createComposite(Composite parent) {
-		setLayout(new GridLayout(1, false));
+		setLayout(createLayout());
 		setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		composite = new Composite(this, SWT.NONE);
+//		composite.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+
 		composite.addPaintListener(new PaintListener() {
 
 			@Override
@@ -49,16 +55,16 @@ public class CSSearchText extends Composite {
 				} else {
 					gc.setForeground(focusOut);
 				}
-				gc.fillRoundRectangle(2, 2, bounds.width - 4, bounds.height - 4, 25, 25);
-				gc.drawRoundRectangle(1, 1, bounds.width - 2, bounds.height - 2, 25, 25);
+				gc.fillRoundRectangle(2, 2, bounds.width - 4, bounds.height - 4, 20, 20);
+				gc.drawRoundRectangle(1, 1, bounds.width - 4, bounds.height - 4, 20, 20);
 				
 			}
 		});
 
 		GridLayout gridLayout = new GridLayout(2, false);
-		gridLayout.marginHeight = 5;
-		gridLayout.marginLeft = 10;
-		gridLayout.marginRight = 5;
+		gridLayout.marginHeight = MARGIN_HEIGHT;
+		gridLayout.marginLeft = MARGIN_lEFT;
+		gridLayout.marginRight = MARGIN_RIGHT;
 		composite.setLayout(gridLayout);
 		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		text = new Text(composite, SWT.SINGLE);
@@ -82,6 +88,18 @@ public class CSSearchText extends Composite {
 		text.setLayoutData(gridData);
 		text.setMessage("Search");
 		searchButton = new CSSearchButton(composite);
+	}
+
+	private Layout createLayout(){
+		GridLayout layout = new GridLayout(1,true);
+		layout.verticalSpacing = 0;
+		layout.marginBottom = 0;
+		layout.marginTop = 0;
+		layout.marginLeft = 0;
+		layout.marginTop = 0;
+		layout.marginWidth = 0;
+		layout.marginHeight = 0;
+		return layout;
 	}
 	
 	public void addSelectionListener(SelectionListener selectionListener) {
