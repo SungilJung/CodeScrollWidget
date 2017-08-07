@@ -24,7 +24,7 @@ public class CSPieChartTest {
 		display = new Display();
 		shell = new Shell(display);
 		shell.setLayout(new GridLayout(5, false));
-		shell.setSize(450, 200);
+		shell.setSize(400, 150);
 		initData();
 		createPieChart();
 	}
@@ -44,6 +44,8 @@ public class CSPieChartTest {
 			pieChartArr[i].setTitleColor(display.getSystemColor(SWT.COLOR_GRAY));
 			pieChartArr[i].setTitle(titleArr[i]);
 			pieChartArr[i].setValue(valueArr[i]);
+			pieChartArr[i].setFontSize(9);
+			pieChartArr[i].setThickness(13);
 			pieChartArr[i].setOuterCircleColor(SWTGraphicUtil.getColorSafely(200+i, 156 + i*10, 120 + i*20));;
 		}
 

@@ -10,6 +10,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 
+import com.codescroll.widget.util.SWTGraphicUtil;
+
 public class CSPieChart extends Composite{
 
 	private CSPie pie;
@@ -104,6 +106,14 @@ public class CSPieChart extends Composite{
 	
 	@Override
 	public void setLayout(Layout layout) {
+	}
+	
+	public void initValue() {
+		pie.initState();
+	}
+	
+	public void setThickness(int thickness) {
+		pie.setThickness(thickness);
 	}
 	
 }

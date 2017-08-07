@@ -191,8 +191,6 @@ public class ToggleButton extends CSAbstractButton {
 
 	@Override
 	public void addListeners() {
-		super.addListeners();
-
 		addListener(SWT.MouseUp, new Listener() {
 
 			public void handleEvent(Event paramEvent) {
@@ -209,6 +207,7 @@ public class ToggleButton extends CSAbstractButton {
 				}
 			}
 		});
+		super.addListeners();
 	}
 
 	@Override
@@ -235,6 +234,10 @@ public class ToggleButton extends CSAbstractButton {
 		Point stringExtent = tempGC.textExtent(str);
 		tempGC.dispose();
 		return stringExtent;
+	}
+	
+	public void setSelection(Position position) {
+		selectionIndex = position.ordinal();
 	}
 
 }

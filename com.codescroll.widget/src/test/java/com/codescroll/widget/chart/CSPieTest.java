@@ -61,6 +61,7 @@ public class CSPieTest {
 
 	@Test
 	public void drawValueDownTest() {
+		
 		value = 100;
 		button.addSelectionListener(new SelectionListener() {
 

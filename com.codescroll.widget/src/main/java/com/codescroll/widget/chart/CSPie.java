@@ -84,7 +84,7 @@ public class CSPie extends CSWidget {
 		setFont(new Font(getDisplay(), "Arial", 12, SWT.BOLD));
 	}
 
-	private void setThickness(int thickness) {
+	public void setThickness(int thickness) {
 
 		int outerThickness = thickness;
 		if (outerThickness < 4) {
