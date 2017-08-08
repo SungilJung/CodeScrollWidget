@@ -84,6 +84,32 @@ public class CSPieChart extends Composite{
 		titleLabel.setFont(font);
 	}
 	
+	public void setTtitleFont(Font font) {
+		checkWidget();
+		titleLabel.setFont(font);
+	}
+	
+	public void setPieFont(Font font) {
+		checkSubclass();
+		pie.setFont(font);
+	}
+	
+	public void setTitleFontSize(int size) {
+		checkWidget();
+		FontData fontData = titleLabel.getFont().getFontData()[0];
+		fontData.setHeight(size);
+		Font font = new Font(getDisplay(), fontData);
+		titleLabel.setFont(font);
+	}
+	
+	public void setPieFontSize(int size) {
+		checkWidget();
+		FontData fontData = pie.getFont().getFontData()[0];
+		fontData.setHeight(size);
+		Font font = new Font(getDisplay(), fontData);
+		pie.setFont(font);
+	}
+	
 	public void setFontSize(int size) {
 		checkWidget();
 		FontData fontData = getFont().getFontData()[0];

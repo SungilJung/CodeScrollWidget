@@ -38,7 +38,8 @@ public class CSPie extends CSWidget {
 	private int innerThickness;
 	private int preStateAlpha;
 	private boolean isCalculate;
-
+	private boolean isCancel;
+	
 	public CSPie(Composite paramComposite) {
 		super(paramComposite);
 		init();
@@ -56,6 +57,7 @@ public class CSPie extends CSWidget {
 		preState = MIN_STATE;
 		state = MIN_STATE;
 		isCalculate = false;
+		isCancel = true;
 		redraw();
 	}
 
@@ -262,6 +264,7 @@ public class CSPie extends CSWidget {
 		final float goal = getGoal(value);
 		final int[] milliseconds = new int[] { 5 };
 		initState();
+		isCancel = false;
 
 		drawState(preGoal, goal, milliseconds);
 
@@ -273,6 +276,11 @@ public class CSPie extends CSWidget {
 
 			@Override
 			public void run() {
+				
+				if(isCancel) {
+					return;
+				}
+				
 				if (state != goal || preState != preGoal) {
 					isCalculate = true;
 
@@ -308,6 +316,11 @@ public class CSPie extends CSWidget {
 					
 					@Override
 					public void run() {
+						
+						if(isCancel) {
+							return;
+						}
+						
 						if(preStateAlpha != MIN_ALPHA && preState != 0) {
 							preStateAlpha-=20;
 							if(preStateAlpha < MIN_ALPHA) {
