@@ -39,7 +39,11 @@ public class ToggleButton extends CSAbstractButton {
 	private int selectionIndex;
 	private int minHeight;
 	private int minWidth;
-	
+	private int borderRectangleX;
+	private int borderRectangleWidth;
+	private int rightTextX;
+	private Point leftExtent;
+	private Point rightExtent;
 
 	public ToggleButton(Composite parent) {
 		super(parent);
@@ -65,14 +69,14 @@ public class ToggleButton extends CSAbstractButton {
 		String leftText = toggleTexts[Position.LEFT.ordinal()];
 		String rightText = toggleTexts[Position.RIGHT.ordinal()];
 
-		Point leftExtent = gc.textExtent(leftText);
-		Point rightExtent = gc.textExtent(rightText);
+		leftExtent = gc.textExtent(leftText);
+		rightExtent = gc.textExtent(rightText);
 
-		int borderRectangleX = leftExtent.x + HORIZONTAL_SPACING;
-		int borderRectangleWidth = width - (leftExtent.x + rightExtent.x + (HORIZONTAL_SPACING) * 2);
+		borderRectangleX = leftExtent.x + HORIZONTAL_SPACING;
+		borderRectangleWidth = width - (leftExtent.x + rightExtent.x + (HORIZONTAL_SPACING) * 2);
 		borderRectangleWidth = Math.max(borderRectangleWidth, (height - (MARGIN + BORDER_MARGIN)));
 
-		int rightTextX = leftExtent.x + borderRectangleWidth + HORIZONTAL_SPACING * 2;
+		rightTextX = leftExtent.x + borderRectangleWidth + HORIZONTAL_SPACING * 2;
 		rightTextX = Math.max(rightTextX, width - rightExtent.x);
 
 		int circleDiameter = height - (MARGIN);
@@ -93,7 +97,7 @@ public class ToggleButton extends CSAbstractButton {
 		drawCircle(gc, circleX, circleDiameter);
 
 		gc.setForeground(getSelectionFontColor(Position.RIGHT.ordinal()));
-		gc.drawText(rightText, rightTextX, (height) / 2 - rightExtent.y / 2 , true);
+		gc.drawText(rightText, rightTextX, (height) / 2 - rightExtent.y / 2, true);
 
 	}
 
@@ -198,10 +202,25 @@ public class ToggleButton extends CSAbstractButton {
 				Set<SelectionListener> listeners = getListeners();
 
 				if (listeners != null && paramEvent.button == 1) {
-					if (halfWidth <= paramEvent.x) {
-						selectionIndex = Position.RIGHT.ordinal();
-					} else {
+					
+					//왼쪽 텍스트 선택 시
+					if(0 < paramEvent.x && paramEvent.x < leftExtent.x) {
 						selectionIndex = Position.LEFT.ordinal();
+					}
+					
+					//가운데 선택 시
+					if(borderRectangleX < paramEvent.x && paramEvent.x < borderRectangleX + borderRectangleWidth) {
+						if(selectionIndex == Position.LEFT.ordinal()) {
+							selectionIndex = Position.RIGHT.ordinal();
+						}else {
+							selectionIndex = Position.LEFT.ordinal();
+						}
+					}
+					
+					//우축 텍스트 선택 시
+					if(rightTextX < paramEvent.x && paramEvent.x < rightTextX + rightExtent.x) {
+						selectionIndex = Position.RIGHT.ordinal();
+
 					}
 					redraw();
 				}
@@ -235,7 +254,7 @@ public class ToggleButton extends CSAbstractButton {
 		tempGC.dispose();
 		return stringExtent;
 	}
-	
+
 	public void setSelection(Position position) {
 		selectionIndex = position.ordinal();
 	}
