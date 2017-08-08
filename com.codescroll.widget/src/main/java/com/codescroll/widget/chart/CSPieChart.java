@@ -109,6 +109,7 @@ public class CSPieChart extends Composite{
 	}
 	
 	public void initValue() {
+		checkWidget();
 		pie.initState();
 	}
 	

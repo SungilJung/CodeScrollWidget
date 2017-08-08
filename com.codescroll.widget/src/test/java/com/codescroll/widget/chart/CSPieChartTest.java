@@ -46,14 +46,14 @@ public class CSPieChartTest {
 			pieChartArr[i].setValue(valueArr[i]);
 			pieChartArr[i].setFontSize(9);
 			pieChartArr[i].setThickness(13);
-			pieChartArr[i].setOuterCircleColor(SWTGraphicUtil.getColorSafely(200+i, 156 + i*10, 120 + i*20));;
+			pieChartArr[i].setOuterCircleColor(SWTGraphicUtil.getColorSafely(200 + i, 156 + i * 10, 120 + i * 20));
+			;
 		}
 
 	}
 
 	@Test
 	public void test() {
-
 	}
 
 	@After

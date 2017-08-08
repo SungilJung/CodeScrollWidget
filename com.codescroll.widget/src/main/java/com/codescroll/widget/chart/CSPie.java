@@ -56,6 +56,7 @@ public class CSPie extends CSWidget {
 		preState = MIN_STATE;
 		state = MIN_STATE;
 		isCalculate = false;
+		redraw();
 	}
 
 	private void initColor() {
