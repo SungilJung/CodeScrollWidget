@@ -100,11 +100,18 @@ public class CSPieTest {
 	@Test
 	public void drawValueInitTest() {
 		value = 50;
+		
+		boolean[] isInit = new boolean[]{false};
 		button.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent paramSelectionEvent) {
-				pie.initState();
-				pie.setValue(50);
+				if(isInit[0]) {
+					pie.initState();
+				}else{
+					
+					pie.setValue(50);
+				}
+				isInit[0] = !isInit[0];
 			}
 
 			public void widgetDefaultSelected(SelectionEvent paramSelectionEvent) {

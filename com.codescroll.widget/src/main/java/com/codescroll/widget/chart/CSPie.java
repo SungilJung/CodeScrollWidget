@@ -7,6 +7,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 import com.codescroll.widget.CSWidget;
 import com.codescroll.widget.util.SWTGraphicUtil;
@@ -39,6 +40,9 @@ public class CSPie extends CSWidget {
 	private int preStateAlpha;
 	private boolean isCalculate;
 	private boolean isCancel;
+	private float preGoal;
+	private float goal;
+	private Color preTextColor;
 	
 	public CSPie(Composite paramComposite) {
 		super(paramComposite);
@@ -66,6 +70,7 @@ public class CSPie extends CSWidget {
 		outerShadowColor = getShadowColor(outerColor);
 		innerColor = SWTGraphicUtil.getColorSafely(255, 204, 153);
 		innerShadowColor = getShadowColor(innerColor);
+		preTextColor = SWTGraphicUtil.getColorSafely(33, 33, 33);
 	}
 
 	private Color getShadowColor(Color color) {
@@ -84,7 +89,7 @@ public class CSPie extends CSWidget {
 	}
 
 	private void initFont() {
-		setFont(new Font(getDisplay(), "Arial", 12, SWT.BOLD));
+		setFont(new Font(Display.getDefault(), "Arial", 12, SWT.BOLD));
 	}
 
 	public void setThickness(int thickness) {
@@ -165,7 +170,7 @@ public class CSPie extends CSWidget {
 				(int) (MAX_STATE * ANGLE));
 		
 		// draw innerCircle
-		if (preState != 0) {
+		if (preState != state) {
 			gc.setAlpha(shadowAlpha);
 			gc.setBackground(innerShadowColor);
 			gc.fillArc(innerCircleX / 2, innerCircleY / 2, innerCircleWidth, innerCircleHeight, 0,
@@ -187,11 +192,12 @@ public class CSPie extends CSWidget {
 		
 		gc.setForeground(getForeground());
 		
-		if (preState != 0) {
+		if (preState != state) {
 			gc.setAlpha(DEFAULT_ALPHA);
 			gc.drawText(valueTxt, (x / 2) - (textPoint.x / 2), (y / 2) - (textPoint.y / 2), true);
 			gc.setFont(preTextFont);
 			gc.setAlpha(preTextAlpha);
+			gc.setForeground(preTextColor);
 			gc.drawText(preValueTxt, (x / 2) - (preTextPoint.x / 2), (y / 2) + (preTextPoint.y), true);
 		} else {
 			gc.setAlpha(DEFAULT_ALPHA);
@@ -239,6 +245,10 @@ public class CSPie extends CSWidget {
 		innerColor = color;
 		innerShadowColor = getShadowColor(color);
 	}
+	
+	public void setPreTextColor(Color color) {
+		preTextColor = color;
+	}
 
 	@Override
 	public void setFont(Font font) {
@@ -246,12 +256,13 @@ public class CSPie extends CSWidget {
 		super.setFont(font);
 	}
 
-	private void setPreTextFont(Font font) {
+	public void setPreTextFont(Font font) {
 		FontData fontData = font.getFontData()[0];
 		int preFontHeight = fontData.getHeight() - 6;
 		preFontHeight = preFontHeight < 8 ? 8 : preFontHeight;
-		preTextFont = new Font(getDisplay(), fontData.getName(), preFontHeight, fontData.getStyle());
+		preTextFont = new Font(Display.getDefault(), fontData.getName(), preFontHeight, fontData.getStyle());
 	}
+	
 
 	public void setValue(float value) {
 
@@ -260,19 +271,24 @@ public class CSPie extends CSWidget {
 		}
 		
 		preStateAlpha = DEFAULT_ALPHA;
-		final float preGoal = state;
-		final float goal = getGoal(value);
+		preGoal = state;
+		goal = getGoal(value);
 		final int[] milliseconds = new int[] { 5 };
 		initState();
 		isCancel = false;
-
-		drawState(preGoal, goal, milliseconds);
+		
+		if(preGoal != goal) {
+			drawState(preGoal, goal, milliseconds);
+		}else {
+			state = goal;
+			preState = goal;
+		}
 
 		redraw();
 	}
 
 	private void drawState(final float preGoal, final float goal, final int[] milliseconds) {
-		getDisplay().timerExec(milliseconds[0], new Runnable() {
+		Display.getDefault().timerExec(milliseconds[0], new Runnable() {
 
 			@Override
 			public void run() {
@@ -304,7 +320,7 @@ public class CSPie extends CSWidget {
 
 					if (!CSPie.this.isDisposed()) {
 						redraw();
-						getDisplay().timerExec(milliseconds[0], this);
+						Display.getDefault().timerExec(milliseconds[0], this);
 					}
 				} else {
 					drawTransparentCircle();
@@ -312,7 +328,7 @@ public class CSPie extends CSWidget {
 			}
 
 			private void drawTransparentCircle() {
-				getDisplay().timerExec(100, new Runnable() {
+				Display.getDefault().timerExec(100, new Runnable() {
 					
 					@Override
 					public void run() {
@@ -321,15 +337,15 @@ public class CSPie extends CSWidget {
 							return;
 						}
 						
-						if(preStateAlpha != MIN_ALPHA && preState != 0) {
-							preStateAlpha-=20;
+						if(preStateAlpha != MIN_ALPHA && preState != state) {
+							preStateAlpha-=15;
 							if(preStateAlpha < MIN_ALPHA) {
 								preStateAlpha = MIN_ALPHA;
 							}
 							
 							if (!CSPie.this.isDisposed()) {
 								redraw();
-								getDisplay().timerExec(100, this);
+								Display.getDefault().timerExec(100, this);
 							}
 							
 						}else {
@@ -353,6 +369,12 @@ public class CSPie extends CSWidget {
 
 	public boolean isCalculate() {
 		return isCalculate;
+	}
+	
+	@Override
+	public void setForeground(Color color) {
+		super.setForeground(color);
+		preTextColor = color;
 	}
 
 }

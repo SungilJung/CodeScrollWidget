@@ -10,8 +10,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 
-import com.codescroll.widget.util.SWTGraphicUtil;
-
 public class CSPieChart extends Composite{
 
 	private CSPie pie;
@@ -32,7 +30,7 @@ public class CSPieChart extends Composite{
 
 	private Layout createLayout(){
 		GridLayout layout = new GridLayout(1,true);
-		layout.verticalSpacing = 0;
+		layout.verticalSpacing = 5;
 		layout.marginBottom = 0;
 		layout.marginTop = 0;
 		layout.marginLeft = 0;
@@ -128,6 +126,14 @@ public class CSPieChart extends Composite{
 
 	public void setInnerCircleColor(Color color) {
 		pie.setInnerCircleColor(color);
+	}
+	
+	public void setPreValueTextColor(Color color) {
+		pie.setPreTextColor(color);
+	}
+	
+	public void setPreValueTextFont(Font font) {
+		pie.setPreTextFont(font);
 	}
 	
 	@Override

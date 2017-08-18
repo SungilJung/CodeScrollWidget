@@ -112,4 +112,8 @@ public class CSSearchText extends Composite {
 	public String getText() {
 		return text.getText();
 	}
+	
+	public Text getTextWidget() {
+		return text;
+	}
 }
