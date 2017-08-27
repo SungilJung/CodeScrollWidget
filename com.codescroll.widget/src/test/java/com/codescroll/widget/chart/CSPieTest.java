@@ -1,5 +1,7 @@
 package com.codescroll.widget.chart;
 
+import java.util.Random;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -59,17 +61,15 @@ public class CSPieTest {
 		return button;
 	}
 
-	@Test
+	// @Test
 	public void drawValueDownTest() {
-		
+
 		value = 100;
 		button.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent paramSelectionEvent) {
-				if (!pie.isCalculate()) {
 					pie.setValue(value);
 					value -= 10;
-				}
 			}
 
 			public void widgetDefaultSelected(SelectionEvent paramSelectionEvent) {
@@ -78,16 +78,14 @@ public class CSPieTest {
 		});
 	}
 
-	@Test
+	// @Test
 	public void drawValueUPTest() {
 		value = 10;
 		button.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent paramSelectionEvent) {
-				if (!pie.isCalculate()) {
 					pie.setValue(value);
 					value += 10.5;
-				}
 			}
 
 			public void widgetDefaultSelected(SelectionEvent paramSelectionEvent) {
@@ -96,22 +94,18 @@ public class CSPieTest {
 		});
 
 	}
-	
+
 	@Test
 	public void drawValueInitTest() {
-		value = 50;
-		
-		boolean[] isInit = new boolean[]{false};
+
 		button.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent paramSelectionEvent) {
-				if(isInit[0]) {
-					pie.initState();
-				}else{
-					
-					pie.setValue(50);
-				}
-				isInit[0] = !isInit[0];
+				
+				int value = (int) (Math.random() * 100 + 1);
+				System.out.println("value:  " + value);
+				pie.initState();
+				pie.setValue(value);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent paramSelectionEvent) {

@@ -38,12 +38,12 @@ public class CSPie extends CSWidget {
 	private int outerThickness;
 	private int innerThickness;
 	private int preStateAlpha;
-	private boolean isCalculate;
-	private boolean isCancel;
 	private float preGoal;
 	private float goal;
 	private Color preTextColor;
-	
+
+	private Thread csPieThread;
+
 	public CSPie(Composite paramComposite) {
 		super(paramComposite);
 		init();
@@ -60,9 +60,6 @@ public class CSPie extends CSWidget {
 	public void initState() {
 		preState = MIN_STATE;
 		state = MIN_STATE;
-		isCalculate = false;
-		isCancel = true;
-		redraw();
 	}
 
 	private void initColor() {
@@ -76,9 +73,9 @@ public class CSPie extends CSWidget {
 	private Color getShadowColor(Color color) {
 
 		int max = 255;
-		int red = color.getRed() + 30;
-		int green = color.getGreen() + 30;
-		int blue = color.getBlue() + 30;
+		int red = color.getRed() + 80;
+		int green = color.getGreen() + 80;
+		int blue = color.getBlue() + 80;
 
 		red = Math.min(red, max);
 		green = Math.min(green, max);
@@ -103,13 +100,12 @@ public class CSPie extends CSWidget {
 
 		this.outerThickness = outerThickness;
 		this.innerThickness = outerThickness - 5 < 1 ? 1 : outerThickness - 5;
-		
+
 	}
-	
+
 	private void setPreStateAlpha(int alpha) {
 		preStateAlpha = alpha;
 	}
-	
 
 	@Override
 	protected void drawWidget(GC gc) {
@@ -143,19 +139,19 @@ public class CSPie extends CSWidget {
 		Point preTextPoint = getTextPoint(preValueTxt, preTextFont);
 
 		int shadowAlpha;
-		int innerCircleAlpha ;
+		int innerCircleAlpha;
 		int preTextAlpha;
-		
-		if(preStateAlpha == DEFAULT_ALPHA) {
+
+		if (preStateAlpha == DEFAULT_ALPHA) {
 			shadowAlpha = SHADOW_ALPHA;
 			innerCircleAlpha = DEFAULT_ALPHA;
 			preTextAlpha = DEFAULT_ALPHA;
-		}else {
+		} else {
 			shadowAlpha = preStateAlpha;
 			innerCircleAlpha = preStateAlpha;
 			preTextAlpha = preStateAlpha;
 		}
-		
+
 		// draw outerCircle
 		gc.setAlpha(SHADOW_ALPHA);
 		gc.setBackground(outerShadowColor);
@@ -168,9 +164,9 @@ public class CSPie extends CSWidget {
 		gc.setBackground(getBackground());
 		gc.fillArc(innerCircleX / 2, innerCircleY / 2, innerCircleWidth, innerCircleHeight, 0,
 				(int) (MAX_STATE * ANGLE));
-		
+
 		// draw innerCircle
-		if (preState != state) {
+		if (preState != state && preState != 0) {
 			gc.setAlpha(shadowAlpha);
 			gc.setBackground(innerShadowColor);
 			gc.fillArc(innerCircleX / 2, innerCircleY / 2, innerCircleWidth, innerCircleHeight, 0,
@@ -179,7 +175,7 @@ public class CSPie extends CSWidget {
 			gc.setAlpha(innerCircleAlpha);
 			gc.setBackground(innerColor);
 			gc.fillArc(innerCircleX / 2, innerCircleY / 2, innerCircleWidth, innerCircleHeight, 90, -preArc);
-			
+
 			gc.setAlpha(DEFAULT_ALPHA);
 			gc.setBackground(getBackground());
 			gc.fillArc((innerCircleX + innerThickness) / 2, (innerCircleY + innerThickness) / 2,
@@ -187,12 +183,11 @@ public class CSPie extends CSWidget {
 					(int) (MAX_STATE * ANGLE));
 		}
 
-		
 		// draw text
-		
+
 		gc.setForeground(getForeground());
-		
-		if (preState != state) {
+
+		if (preState != state && preState != 0) {
 			gc.setAlpha(DEFAULT_ALPHA);
 			gc.drawText(valueTxt, (x / 2) - (textPoint.x / 2), (y / 2) - (textPoint.y / 2), true);
 			gc.setFont(preTextFont);
@@ -245,7 +240,7 @@ public class CSPie extends CSWidget {
 		innerColor = color;
 		innerShadowColor = getShadowColor(color);
 	}
-	
+
 	public void setPreTextColor(Color color) {
 		preTextColor = color;
 	}
@@ -262,24 +257,18 @@ public class CSPie extends CSWidget {
 		preFontHeight = preFontHeight < 8 ? 8 : preFontHeight;
 		preTextFont = new Font(Display.getDefault(), fontData.getName(), preFontHeight, fontData.getStyle());
 	}
-	
 
 	public void setValue(float value) {
 
-		if (isCalculate) {
-			return;
-		}
-		
 		preStateAlpha = DEFAULT_ALPHA;
 		preGoal = state;
 		goal = getGoal(value);
-		final int[] milliseconds = new int[] { 5 };
 		initState();
-		isCancel = false;
-		
-		if(preGoal != goal) {
-			drawState(preGoal, goal, milliseconds);
-		}else {
+		initThread();
+
+		if (preGoal != goal) {
+			csPieThread.start();
+		} else {
 			state = goal;
 			preState = goal;
 		}
@@ -287,74 +276,12 @@ public class CSPie extends CSWidget {
 		redraw();
 	}
 
-	private void drawState(final float preGoal, final float goal, final int[] milliseconds) {
-		Display.getDefault().timerExec(milliseconds[0], new Runnable() {
-
-			@Override
-			public void run() {
-				
-				if(isCancel) {
-					return;
-				}
-				
-				if (state != goal || preState != preGoal) {
-					isCalculate = true;
-
-					if (state != goal) {
-						state++;
-						if (state > goal) {
-							state = goal;
-						}
-					}
-
-					if (preState != preGoal) {
-						preState += 2;
-						if (preState > preGoal) {
-							preState = preGoal;
-						}
-					}
-
-					if (milliseconds[0] < 10) {
-						milliseconds[0] += 1;
-					}
-
-					if (!CSPie.this.isDisposed()) {
-						redraw();
-						Display.getDefault().timerExec(milliseconds[0], this);
-					}
-				} else {
-					drawTransparentCircle();
-				}
-			}
-
-			private void drawTransparentCircle() {
-				Display.getDefault().timerExec(100, new Runnable() {
-					
-					@Override
-					public void run() {
-						
-						if(isCancel) {
-							return;
-						}
-						
-						if(preStateAlpha != MIN_ALPHA && preState != state) {
-							preStateAlpha-=15;
-							if(preStateAlpha < MIN_ALPHA) {
-								preStateAlpha = MIN_ALPHA;
-							}
-							
-							if (!CSPie.this.isDisposed()) {
-								redraw();
-								Display.getDefault().timerExec(100, this);
-							}
-							
-						}else {
-							isCalculate = false;
-						}
-					}
-				});
-			}
-		});
+	private void initThread() {
+		
+		if(csPieThread != null) {
+			csPieThread.interrupt();
+		}
+		csPieThread = new Thread(new CSPieRunnable());
 	}
 
 	private float getGoal(float value) {
@@ -367,14 +294,71 @@ public class CSPie extends CSWidget {
 		}
 	}
 
-	public boolean isCalculate() {
-		return isCalculate;
-	}
-	
 	@Override
 	public void setForeground(Color color) {
 		super.setForeground(color);
 		preTextColor = color;
+	}
+
+	class CSPieRunnable implements Runnable {
+
+		@Override
+		public void run() {
+			while (state != goal || preState != preGoal) {
+				if (state != goal) {
+					state++;
+					if (state > goal) {
+						state = goal;
+					}
+				}
+
+				if (preState != preGoal) {
+					preState += 2;
+					if (preState > preGoal) {
+						preState = preGoal;
+					}
+				}
+				try {
+					Thread.sleep(30);
+				} catch (InterruptedException e) {
+					break;
+				}
+				Display.getDefault().asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						
+						if(!isDisposed()) {
+							redraw();
+						}
+					}
+				});
+			}
+		}
+
+		private void drawTransparentCircle() {
+			while (preStateAlpha != MIN_ALPHA && preState != state) {
+				preStateAlpha -= 7;
+				if (preStateAlpha < MIN_ALPHA) {
+					preStateAlpha = MIN_ALPHA;
+				}
+
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				Display.getDefault().asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						if(!isDisposed()) {
+							redraw();
+						}
+					}
+				});
+			}
+		}
 	}
 
 }
