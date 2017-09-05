@@ -142,7 +142,7 @@ public class CSPieChart extends Composite{
 	
 	public void initValue() {
 		checkWidget();
-		pie.initState();
+		pie.initValue();
 	}
 	
 	public void setThickness(int thickness) {

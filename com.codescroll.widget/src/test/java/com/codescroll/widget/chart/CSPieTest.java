@@ -1,7 +1,5 @@
 package com.codescroll.widget.chart;
 
-import java.util.Random;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -61,15 +59,15 @@ public class CSPieTest {
 		return button;
 	}
 
-	// @Test
+	@Test
 	public void drawValueDownTest() {
 
 		value = 100;
 		button.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent paramSelectionEvent) {
-					pie.setValue(value);
-					value -= 10;
+				pie.setValue(value);
+				value -= 10;
 			}
 
 			public void widgetDefaultSelected(SelectionEvent paramSelectionEvent) {
@@ -78,14 +76,15 @@ public class CSPieTest {
 		});
 	}
 
-	// @Test
+	@Test
 	public void drawValueUPTest() {
 		value = 10;
 		button.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent paramSelectionEvent) {
-					pie.setValue(value);
-					value += 10.5;
+				System.out.println("value: " + value);
+				pie.setValue(value);
+				value += 10.25;
 			}
 
 			public void widgetDefaultSelected(SelectionEvent paramSelectionEvent) {
@@ -101,10 +100,10 @@ public class CSPieTest {
 		button.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent paramSelectionEvent) {
-				
+
 				int value = (int) (Math.random() * 100 + 1);
 				System.out.println("value:  " + value);
-				pie.initState();
+				pie.initValue();
 				pie.setValue(value);
 			}
 

@@ -4,7 +4,7 @@
 
 	<groupId>codescroll</groupId>
 	<artifactId>com.codescroll.widget</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<packaging>jar</packaging>
 
 	<name>com.codescroll.widget</name>
@@ -68,6 +68,13 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.eclipse/draw2d -->
+		<dependency>
+			<groupId>org.eclipse</groupId>
+			<artifactId>draw2d</artifactId>
+			<version>3.2.100-v20070529</version>
 		</dependency>
 	</dependencies>
 </project>

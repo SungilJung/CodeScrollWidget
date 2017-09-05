@@ -1,14 +1,11 @@
 package com.codescroll.widget.button;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-
-import com.codescroll.widget.util.SWTGraphicUtil;
 
 public class CSSearchButton extends CSAbstractButton {
 	private Image searchImage;

@@ -1,5 +1,8 @@
 package com.codescroll.widget.chart;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -10,6 +13,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
 import com.codescroll.widget.CSWidget;
+import com.codescroll.widget.chart.animation.AccelerateDecelerateAnimation;
+import com.codescroll.widget.chart.animation.IAnimation;
 import com.codescroll.widget.util.SWTGraphicUtil;
 
 public class CSPie extends CSWidget {
@@ -34,11 +39,10 @@ public class CSPie extends CSWidget {
 	private Font preTextFont;
 
 	private float state;
-	private float preState;
 	private int outerThickness;
 	private int innerThickness;
 	private int preStateAlpha;
-	private float preGoal;
+	private volatile float preGoal;
 	private float goal;
 	private Color preTextColor;
 
@@ -57,25 +61,30 @@ public class CSPie extends CSWidget {
 		setPreStateAlpha(DEFAULT_ALPHA);
 	}
 
-	public void initState() {
-		preState = MIN_STATE;
+	private void initState() {
 		state = MIN_STATE;
 	}
 
+	public void initValue() {
+		initState();
+		preGoal = MIN_STATE;
+		goal = MIN_STATE;
+	}
+
 	private void initColor() {
-		outerColor = SWTGraphicUtil.getColorSafely(193, 141, 34);
-		outerShadowColor = getShadowColor(outerColor);
+		outerColor = SWTGraphicUtil.getColorSafely(190, 166, 48);
+		outerShadowColor = SWTGraphicUtil.getColorSafely(248, 222, 126);
 		innerColor = SWTGraphicUtil.getColorSafely(255, 204, 153);
-		innerShadowColor = getShadowColor(innerColor);
+		innerShadowColor = SWTGraphicUtil.getColorSafely(253, 245, 230);
 		preTextColor = SWTGraphicUtil.getColorSafely(33, 33, 33);
 	}
 
 	private Color getShadowColor(Color color) {
 
 		int max = 255;
-		int red = color.getRed() + 80;
-		int green = color.getGreen() + 80;
-		int blue = color.getBlue() + 80;
+		int red = color.getRed() + 50;
+		int green = color.getGreen() + 50;
+		int blue = color.getBlue() + 50;
 
 		red = Math.min(red, max);
 		green = Math.min(green, max);
@@ -112,7 +121,7 @@ public class CSPie extends CSWidget {
 		gc.setAntialias(SWT.ON);
 
 		int arc = (int) (state * ANGLE);// 360/100 = 3.6
-		int preArc = (int) (preState * ANGLE);
+		int preArc = (int) (preGoal * ANGLE);
 		Point circlePoint = getCircleSize();
 
 		int x = getSize().x;
@@ -125,16 +134,14 @@ public class CSPie extends CSWidget {
 		int innerCircleWidth = circlePoint.x - outerThickness;
 		int innerCircleHeight = circlePoint.y - outerThickness;
 
-		String valueTxt = getStringOfValue();
+		String valueTxt = state != goal ? getStringOfValue(preGoal) : getStringOfValue(goal);
 		Point textPoint = getTextPoint(valueTxt, getFont());
-		float value;
 		String preValueTxt;
-		if (preState > state) {
-			value = preState - state;
-			preValueTxt = "(-" + String.format("%.1f%%", value) + ")";
+
+		if (preGoal > goal) {
+			preValueTxt = "(" + String.format("%.1f%%", goal - preGoal) + ")";
 		} else {
-			value = state - preState;
-			preValueTxt = "(+" + String.format("%.1f%%", value) + ")";
+			preValueTxt = "(+" + String.format("%.1f%%", goal - preGoal) + ")";
 		}
 		Point preTextPoint = getTextPoint(preValueTxt, preTextFont);
 
@@ -166,7 +173,7 @@ public class CSPie extends CSWidget {
 				(int) (MAX_STATE * ANGLE));
 
 		// draw innerCircle
-		if (preState != state && preState != 0) {
+		if (isDrawPreValue()) {
 			gc.setAlpha(shadowAlpha);
 			gc.setBackground(innerShadowColor);
 			gc.fillArc(innerCircleX / 2, innerCircleY / 2, innerCircleWidth, innerCircleHeight, 0,
@@ -184,10 +191,9 @@ public class CSPie extends CSWidget {
 		}
 
 		// draw text
-
 		gc.setForeground(getForeground());
 
-		if (preState != state && preState != 0) {
+		if (isDrawPreValue() && goal == state) {
 			gc.setAlpha(DEFAULT_ALPHA);
 			gc.drawText(valueTxt, (x / 2) - (textPoint.x / 2), (y / 2) - (textPoint.y / 2), true);
 			gc.setFont(preTextFont);
@@ -198,6 +204,10 @@ public class CSPie extends CSWidget {
 			gc.setAlpha(DEFAULT_ALPHA);
 			gc.drawText(valueTxt, (x / 2) - (textPoint.x / 2), (y / 2) - (textPoint.y / 2), true);
 		}
+	}
+
+	private boolean isDrawPreValue() {
+		return preGoal != 0 && goal != preGoal;
 	}
 
 	private Point getCircleSize() {
@@ -214,11 +224,11 @@ public class CSPie extends CSWidget {
 		return new Point(value, value);
 	}
 
-	private String getStringOfValue() {
-		if (state - (int) state == 0) {
-			return String.format("%d%%", (int) state);
+	private String getStringOfValue(float value) {
+		if (value == 0 || value == 100) {
+			return String.format("%d%%", (int) value);
 		} else {
-			return String.format("%.1f%%", state);
+			return String.format("%.1f%%", value);
 		}
 	}
 
@@ -261,8 +271,9 @@ public class CSPie extends CSWidget {
 	public void setValue(float value) {
 
 		preStateAlpha = DEFAULT_ALPHA;
-		preGoal = state;
+		preGoal = goal;
 		goal = getGoal(value);
+
 		initState();
 		initThread();
 
@@ -270,28 +281,33 @@ public class CSPie extends CSWidget {
 			csPieThread.start();
 		} else {
 			state = goal;
-			preState = goal;
+			preGoal = goal;
 		}
 
 		redraw();
 	}
 
 	private void initThread() {
-		
-		if(csPieThread != null) {
+
+		if (csPieThread != null) {
 			csPieThread.interrupt();
+			csPieThread = null;
 		}
 		csPieThread = new Thread(new CSPieRunnable());
 	}
 
 	private float getGoal(float value) {
+
+		float tempValue;
+
 		if (value >= MAX_STATE) {
-			return MAX_STATE;
+			tempValue = MAX_STATE;
 		} else if (value < MIN_STATE) {
-			return MIN_STATE;
+			tempValue = MIN_STATE;
 		} else {
-			return value;
+			tempValue = value;
 		}
+		return Float.parseFloat(String.format("%.1f", tempValue));
 	}
 
 	@Override
@@ -302,57 +318,71 @@ public class CSPie extends CSWidget {
 
 	class CSPieRunnable implements Runnable {
 
+		private BigDecimal stateValue = new BigDecimal(0.0);
+		private IAnimation animation = new AccelerateDecelerateAnimation();
+
 		@Override
 		public void run() {
-			while (state != goal || preState != preGoal) {
+
+			while (state != goal) {
+
 				if (state != goal) {
-					state++;
+
+					stateValue = stateValue.add(new BigDecimal(0.01f), new MathContext(3));
+					state = getState(goal, stateValue.floatValue());
 					if (state > goal) {
 						state = goal;
 					}
 				}
 
-				if (preState != preGoal) {
-					preState += 2;
-					if (preState > preGoal) {
-						preState = preGoal;
-					}
-				}
 				try {
-					Thread.sleep(30);
+					Thread.sleep(20);
 				} catch (InterruptedException e) {
 					break;
 				}
+
 				Display.getDefault().asyncExec(new Runnable() {
 
 					@Override
 					public void run() {
-						
-						if(!isDisposed()) {
+
+						if (!isDisposed()) {
 							redraw();
 						}
 					}
 				});
 			}
+
+			drawTransparentCircle();
+		}
+
+		private float getState(float goal, float stateValue) {
+
+			if (goal < 1.0f) {
+				return goal;
+			}
+
+			return Float.parseFloat(String.format("%.1f", animation.getValue(stateValue) * goal));
 		}
 
 		private void drawTransparentCircle() {
-			while (preStateAlpha != MIN_ALPHA && preState != state) {
-				preStateAlpha -= 7;
+			while (preStateAlpha != MIN_ALPHA) {
+				preStateAlpha--;
 				if (preStateAlpha < MIN_ALPHA) {
 					preStateAlpha = MIN_ALPHA;
 				}
 
 				try {
-					Thread.sleep(50);
+					Thread.sleep(13);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					return;
+
 				}
 				Display.getDefault().asyncExec(new Runnable() {
 
 					@Override
 					public void run() {
-						if(!isDisposed()) {
+						if (!isDisposed()) {
 							redraw();
 						}
 					}
