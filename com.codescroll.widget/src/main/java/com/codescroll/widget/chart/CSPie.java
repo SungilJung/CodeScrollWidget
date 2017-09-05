@@ -358,10 +358,6 @@ public class CSPie extends CSWidget {
 
 		private float getState(float goal, float stateValue) {
 
-			if (goal < 1.0f) {
-				return goal;
-			}
-
 			return Float.parseFloat(String.format("%.1f", animation.getValue(stateValue) * goal));
 		}
 
