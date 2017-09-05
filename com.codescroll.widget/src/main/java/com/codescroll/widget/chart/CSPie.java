@@ -328,7 +328,7 @@ public class CSPie extends CSWidget {
 
 				if (state != goal) {
 
-					stateValue = stateValue.add(new BigDecimal(0.01f), new MathContext(3));
+					stateValue = stateValue.add(new BigDecimal(0.01f));
 					state = getState(goal, stateValue.floatValue());
 					if (state > goal) {
 						state = goal;
@@ -358,7 +358,7 @@ public class CSPie extends CSWidget {
 
 		private float getState(float goal, float stateValue) {
 
-			return Float.parseFloat(String.format("%.1f", animation.getValue(stateValue) * goal));
+			return animation.getValue(stateValue) * goal;
 		}
 
 		private void drawTransparentCircle() {
