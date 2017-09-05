@@ -1,8 +1,5 @@
 package com.codescroll.widget.chart;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -318,7 +315,7 @@ public class CSPie extends CSWidget {
 
 	class CSPieRunnable implements Runnable {
 
-		private BigDecimal stateValue = new BigDecimal(0.0);
+		private float stateValue = 0.0f;
 		private IAnimation animation = new AccelerateDecelerateAnimation();
 
 		@Override
@@ -328,8 +325,8 @@ public class CSPie extends CSWidget {
 
 				if (state != goal) {
 
-					stateValue = stateValue.add(new BigDecimal(0.01f));
-					state = getState(goal, stateValue.floatValue());
+					stateValue += 0.01f;
+					state = getState(goal, stateValue);
 					if (state > goal) {
 						state = goal;
 					}
