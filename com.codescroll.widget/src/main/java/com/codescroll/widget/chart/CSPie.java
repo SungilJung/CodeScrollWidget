@@ -11,11 +11,14 @@ import org.eclipse.swt.widgets.Display;
 
 import com.codescroll.widget.CSWidget;
 import com.codescroll.widget.chart.animation.AccelerateDecelerateAnimation;
+import com.codescroll.widget.chart.animation.DecelerateAnimation;
 import com.codescroll.widget.chart.animation.IAnimation;
 import com.codescroll.widget.util.SWTGraphicUtil;
 
 public class CSPie extends CSWidget {
 
+	private static final String VALUE_FORMAT = "%.1f";
+	private static final String VALUE_PERCENT_FORMAT = VALUE_FORMAT + "%%";
 	private static final int SHADOW_ALPHA = 120;
 	private static final int DEFAULT_ALPHA = 255;
 	private static final int MIN_ALPHA = 0;
@@ -23,16 +26,17 @@ public class CSPie extends CSWidget {
 	public static final float MAX_STATE = 100.0f;
 	public static final float MIN_STATE = 0.0f;
 
-	private final String MAX_TEXT = "100.0%";
-	private final int DEFAULT_THICKNESS = 16;
+	private static final String MAX_TEXT = "100.0%";
+	private static final int DEFAULT_THICKNESS = 16;
 
-	private final double ANGLE = 3.6;
-	private final int PADDING = 2;
+	private static final double ANGLE = 3.6;
+	private static final int PADDING = 2;
 
 	private Color outerColor;
 	private Color outerShadowColor;
 	private Color innerColor;
 	private Color innerShadowColor;
+	private Color preTextColor;
 	private Font preTextFont;
 
 	private float state;
@@ -41,9 +45,13 @@ public class CSPie extends CSWidget {
 	private int preStateAlpha;
 	private volatile float preGoal;
 	private float goal;
-	private Color preTextColor;
 
+	private int effectShadowThickness;
+	private int effectThickness;
+	private IAnimation animation;
 	private Thread csPieThread;
+	private Color effectCircleColor;
+	private Color effectShadowCircleColor;
 
 	public CSPie(Composite paramComposite) {
 		super(paramComposite);
@@ -54,8 +62,10 @@ public class CSPie extends CSWidget {
 		initState();
 		initColor();
 		initFont();
+		initEffectThickness();
 		setThickness(DEFAULT_THICKNESS);
 		setPreStateAlpha(DEFAULT_ALPHA);
+		setAnimation(new AccelerateDecelerateAnimation());
 	}
 
 	private void initState() {
@@ -74,6 +84,8 @@ public class CSPie extends CSWidget {
 		innerColor = SWTGraphicUtil.getColorSafely(255, 204, 153);
 		innerShadowColor = SWTGraphicUtil.getColorSafely(253, 245, 230);
 		preTextColor = SWTGraphicUtil.getColorSafely(33, 33, 33);
+		effectShadowCircleColor = SWTGraphicUtil.getColorSafely(244, 231, 186);
+		effectCircleColor = SWTGraphicUtil.getColorSafely(190, 166, 48);
 	}
 
 	private Color getShadowColor(Color color) {
@@ -95,6 +107,11 @@ public class CSPie extends CSWidget {
 		setFont(new Font(Display.getDefault(), "Arial", 12, SWT.BOLD));
 	}
 
+	private void initEffectThickness() {
+		effectShadowThickness = Integer.MIN_VALUE;
+		effectThickness = Integer.MIN_VALUE;
+	}
+
 	public void setThickness(int thickness) {
 
 		int outerThickness = thickness;
@@ -113,6 +130,10 @@ public class CSPie extends CSWidget {
 		preStateAlpha = alpha;
 	}
 
+	public void setAnimation(IAnimation animation) {
+		this.animation = animation;
+	}
+
 	@Override
 	protected void drawWidget(GC gc) {
 		gc.setAntialias(SWT.ON);
@@ -125,21 +146,30 @@ public class CSPie extends CSWidget {
 		int y = getSize().y;
 
 		int outerCircleX = (x - circlePoint.x);
-		int outterCircleY = (y - circlePoint.y);
+		int outerCircleY = (y - circlePoint.y);
 		int innerCircleX = outerCircleX + outerThickness;
-		int innerCircleY = outterCircleY + outerThickness;
+		int innerCircleY = outerCircleY + outerThickness;
 		int innerCircleWidth = circlePoint.x - outerThickness;
 		int innerCircleHeight = circlePoint.y - outerThickness;
+
+		int effectShadowCircleX = outerCircleX + effectShadowThickness;
+		int effectShadowCircleY = outerCircleY + effectShadowThickness;
+		int effectShadowCircleWidth = circlePoint.x - effectShadowThickness;
+		int effectShadowCircleHeight = circlePoint.y - effectShadowThickness;
+
+		int effectCircleX = outerCircleX + effectThickness;
+		int effectCircleY = outerCircleY + effectThickness;
+		int effectCircleWidth = circlePoint.x - effectThickness;
+		int effectCircleHeight = circlePoint.y - effectThickness;
+
+		effectShadowThickness = effectShadowThickness == Integer.MIN_VALUE ? circlePoint.x : effectShadowThickness;
+		effectThickness = effectThickness == Integer.MIN_VALUE ? circlePoint.x : effectThickness;
 
 		String valueTxt = state != goal ? getStringOfValue(preGoal) : getStringOfValue(goal);
 		Point textPoint = getTextPoint(valueTxt, getFont());
 		String preValueTxt;
 
-		if (preGoal > goal) {
-			preValueTxt = "(" + String.format("%.1f%%", goal - preGoal) + ")";
-		} else {
-			preValueTxt = "(+" + String.format("%.1f%%", goal - preGoal) + ")";
-		}
+		preValueTxt = getPreValueText();
 		Point preTextPoint = getTextPoint(preValueTxt, preTextFont);
 
 		int shadowAlpha;
@@ -159,11 +189,11 @@ public class CSPie extends CSWidget {
 		// draw outerCircle
 		gc.setAlpha(SHADOW_ALPHA);
 		gc.setBackground(outerShadowColor);
-		gc.fillArc(outerCircleX / 2, outterCircleY / 2, circlePoint.x, circlePoint.y, 0, (int) (MAX_STATE * ANGLE));
+		gc.fillArc(outerCircleX / 2, outerCircleY / 2, circlePoint.x, circlePoint.y, 0, (int) (MAX_STATE * ANGLE));
 
 		gc.setAlpha(DEFAULT_ALPHA);
 		gc.setBackground(outerColor);
-		gc.fillArc(outerCircleX / 2, outterCircleY / 2, circlePoint.x, circlePoint.y, 90, -arc);
+		gc.fillArc(outerCircleX / 2, outerCircleY / 2, circlePoint.x, circlePoint.y, 90, -arc);
 
 		gc.setBackground(getBackground());
 		gc.fillArc(innerCircleX / 2, innerCircleY / 2, innerCircleWidth, innerCircleHeight, 0,
@@ -190,21 +220,41 @@ public class CSPie extends CSWidget {
 		// draw text
 		gc.setForeground(getForeground());
 
-		if (isDrawPreValue() && goal == state) {
-			gc.setAlpha(DEFAULT_ALPHA);
-			gc.drawText(valueTxt, (x / 2) - (textPoint.x / 2), (y / 2) - (textPoint.y / 2), true);
-			gc.setFont(preTextFont);
-			gc.setAlpha(preTextAlpha);
-			gc.setForeground(preTextColor);
-			gc.drawText(preValueTxt, (x / 2) - (preTextPoint.x / 2), (y / 2) + (preTextPoint.y), true);
-		} else {
-			gc.setAlpha(DEFAULT_ALPHA);
-			gc.drawText(valueTxt, (x / 2) - (textPoint.x / 2), (y / 2) - (textPoint.y / 2), true);
-		}
-	}
+		if (state != MAX_STATE) {
 
-	private boolean isDrawPreValue() {
-		return preGoal != 0 && goal != preGoal;
+			if (isDrawPreValue() && goal == state) {
+				gc.setAlpha(DEFAULT_ALPHA);
+				gc.drawText(valueTxt, (x / 2) - (textPoint.x / 2), (y / 2) - (textPoint.y / 2), true);
+				gc.setFont(preTextFont);
+				gc.setAlpha(preTextAlpha);
+				gc.setForeground(preTextColor);
+				gc.drawText(preValueTxt, (x / 2) - (preTextPoint.x / 2), (y / 2) + (preTextPoint.y), true);
+			} else {
+				gc.setAlpha(DEFAULT_ALPHA);
+				gc.drawText(valueTxt, (x / 2) - (textPoint.x / 2), (y / 2) - (textPoint.y / 2), true);
+			}
+		} else {
+
+			if (effectShadowThickness > 0 || effectThickness > 0) {
+
+				if (effectShadowThickness >= outerThickness) {
+					gc.setBackground(effectShadowCircleColor);
+					gc.fillArc(effectShadowCircleX / 2, effectShadowCircleY / 2, effectShadowCircleWidth,
+							effectShadowCircleHeight, 0, (int) (MAX_STATE * ANGLE));
+				}
+				gc.setBackground(effectCircleColor);
+				gc.fillArc(effectCircleX / 2, effectCircleY / 2, effectCircleWidth, effectCircleHeight, 0,
+						(int) (MAX_STATE * ANGLE));
+			} else {
+				FontData fd = getFont().getFontData()[0];
+				fd.setHeight(fd.getHeight() + 2);
+				Font effectFont = new Font(Display.getDefault(), fd);
+				gc.setFont(effectFont);
+				Point effectTextPoint = getTextPoint(valueTxt, gc.getFont());
+				gc.drawText(valueTxt, (x / 2) - (effectTextPoint.x / 2), (y / 2) - (effectTextPoint.y / 2), true);
+				effectFont.dispose();
+			}
+		}
 	}
 
 	private Point getCircleSize() {
@@ -225,8 +275,18 @@ public class CSPie extends CSWidget {
 		if (value == 0 || value == 100) {
 			return String.format("%d%%", (int) value);
 		} else {
-			return String.format("%.1f%%", value);
+			return String.format(VALUE_PERCENT_FORMAT, value);
 		}
+	}
+
+	private String getPreValueText() {
+		String preValueTxt;
+		if (preGoal > goal) {
+			preValueTxt = "(" + String.format(VALUE_PERCENT_FORMAT, goal - preGoal) + ")";
+		} else {
+			preValueTxt = "(+" + String.format(VALUE_PERCENT_FORMAT, goal - preGoal) + ")";
+		}
+		return preValueTxt;
 	}
 
 	private Point getTextPoint(String str, Font font) {
@@ -236,6 +296,10 @@ public class CSPie extends CSWidget {
 		Point stringExtent = tempGC.stringExtent(str);
 		tempGC.dispose();
 		return stringExtent;
+	}
+
+	private boolean isDrawPreValue() {
+		return preGoal != 0 && goal != preGoal && state != MAX_STATE;
 	}
 
 	public void setOuterCircleColor(Color color) {
@@ -273,24 +337,15 @@ public class CSPie extends CSWidget {
 
 		initState();
 		initThread();
+		initEffect();
 
-		if (preGoal != goal) {
-			csPieThread.start();
-		} else {
+		if (preGoal == goal) {
 			state = goal;
 			preGoal = goal;
 		}
 
+		csPieThread.start();
 		redraw();
-	}
-
-	private void initThread() {
-
-		if (csPieThread != null) {
-			csPieThread.interrupt();
-			csPieThread = null;
-		}
-		csPieThread = new Thread(new CSPieRunnable());
 	}
 
 	private float getGoal(float value) {
@@ -304,7 +359,21 @@ public class CSPie extends CSWidget {
 		} else {
 			tempValue = value;
 		}
-		return Float.parseFloat(String.format("%.1f", tempValue));
+		return Float.parseFloat(String.format(VALUE_FORMAT, tempValue));
+	}
+
+	private void initThread() {
+
+		if (csPieThread != null) {
+			csPieThread.interrupt();
+			csPieThread = null;
+		}
+		csPieThread = new Thread(new CSPieRunnable());
+	}
+
+	private void initEffect() {
+		effectShadowThickness = Integer.MIN_VALUE;
+		effectThickness = Integer.MIN_VALUE;
 	}
 
 	@Override
@@ -316,7 +385,10 @@ public class CSPie extends CSWidget {
 	class CSPieRunnable implements Runnable {
 
 		private float stateValue = 0.0f;
-		private IAnimation animation = new AccelerateDecelerateAnimation();
+		private float effectShadowAnimationValue = 0.0f;
+		private float effectAnimationValue = 0.0f;
+		private float effectShadowFactor = 1.0f;
+		private float effectFactor = 0.8f;
 
 		@Override
 		public void run() {
@@ -350,12 +422,60 @@ public class CSPie extends CSWidget {
 				});
 			}
 
+			drawEffectCircle();
 			drawTransparentCircle();
+
 		}
 
 		private float getState(float goal, float stateValue) {
 
 			return animation.getValue(stateValue) * goal;
+		}
+
+		private void drawEffectCircle() {
+			IAnimation effectShadowAnimation = new DecelerateAnimation(effectShadowFactor);
+			IAnimation effectAnimation = new DecelerateAnimation(effectFactor);
+
+			while (effectShadowThickness != 0 || effectThickness != 0) {
+				effectShadowAnimationValue += 0.01f;
+				float shadowValue = effectShadowAnimation.getValue(effectShadowAnimationValue);
+				shadowValue = Float.isNaN(shadowValue) ? 1 : shadowValue;
+				effectShadowThickness = effectShadowThickness - (int) (shadowValue * (effectShadowFactor * 2));
+
+				if (effectShadowAnimationValue > 0.23) {
+					effectAnimationValue += 0.01f;
+					float value = effectAnimation.getValue(effectAnimationValue);
+					value = Float.isNaN(value) ? 1 : value;
+					effectThickness = effectThickness - (int) (value * (effectFactor * 2));
+
+					if (effectThickness < 0) {
+						effectThickness = 0;
+					}
+				}
+
+				if (effectShadowThickness == Integer.MIN_VALUE) {
+					effectShadowThickness = effectThickness;
+				} else if (effectShadowThickness < 0) {
+					effectShadowThickness = 0;
+				}
+
+				try {
+					Thread.sleep(8);
+				} catch (InterruptedException e) {
+					return;
+
+				}
+				Display.getDefault().asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						if (!isDisposed()) {
+							redraw();
+						}
+					}
+				});
+			}
+
 		}
 
 		private void drawTransparentCircle() {

@@ -32,7 +32,7 @@ public class CSPieChartTest {
 	private void initData() {
 		pieChartArr = new CSPieChart[4];
 		titleArr = new String[] { "구문", "분기", "MC/DC", "함수 호출" };
-		valueArr = new float[] { 92.5f, 60, 50, 75 };
+		valueArr = new float[] { 100, 100, 100, 100 };
 	}
 
 	private void createPieChart() {

@@ -78,13 +78,13 @@ public class CSPieTest {
 
 	@Test
 	public void drawValueUPTest() {
-		value = 10;
+		value = 0;
 		button.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent paramSelectionEvent) {
 				System.out.println("value: " + value);
 				pie.setValue(value);
-				value += 10.25;
+				value += 10.5;
 			}
 
 			public void widgetDefaultSelected(SelectionEvent paramSelectionEvent) {

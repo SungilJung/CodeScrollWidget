@@ -6,9 +6,9 @@ import java.math.MathContext;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AccelerateDecelerateAnimationTest {
+public class DecelerateAnimationTest {
 
-	private IAnimation animation = new AccelerateDecelerateAnimation();
+private IAnimation animation = new DecelerateAnimation(1.5f);
 	
 	@Before
 	public void init() {
@@ -28,5 +28,6 @@ public class AccelerateDecelerateAnimationTest {
 		}
 	
 	}
+
 
 }
