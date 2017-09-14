@@ -59,7 +59,7 @@ public class CSPieTest {
 		return button;
 	}
 
-	@Test
+//	@Test
 	public void drawValueDownTest() {
 
 		value = 100;
@@ -69,16 +69,15 @@ public class CSPieTest {
 				pie.setValue(value);
 				value -= 10;
 			}
-
 			public void widgetDefaultSelected(SelectionEvent paramSelectionEvent) {
 
 			}
 		});
 	}
 
-	@Test
+//	@Test
 	public void drawValueUPTest() {
-		value = 0;
+		value = 80;
 		button.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent paramSelectionEvent) {
@@ -104,7 +103,7 @@ public class CSPieTest {
 				int value = (int) (Math.random() * 100 + 1);
 				System.out.println("value:  " + value);
 				pie.initValue();
-				pie.setValue(value);
+				pie.setValue(100);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent paramSelectionEvent) {
