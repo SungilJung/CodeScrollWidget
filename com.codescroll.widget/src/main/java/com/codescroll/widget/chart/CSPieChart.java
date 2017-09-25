@@ -131,10 +131,6 @@ public class CSPieChart extends Composite{
 		pie.setInnerCircleColor(color);
 	}
 	
-	public void setInnerShadowCircleColor(Color color) {
-		pie.setInnerShadowCircleColor(color);
-	}
-	
 	public void setPreValueTextColor(Color color) {
 		pie.setPreTextColor(color);
 	}

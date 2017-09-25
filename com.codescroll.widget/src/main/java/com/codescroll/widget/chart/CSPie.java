@@ -1,5 +1,8 @@
 package com.codescroll.widget.chart;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -35,7 +38,6 @@ public class CSPie extends CSWidget {
 	private Color outerColor;
 	private Color outerShadowColor;
 	private Color innerColor;
-	private Color innerShadowColor;
 	private Color preTextColor;
 	private Font preTextFont;
 
@@ -85,27 +87,10 @@ public class CSPie extends CSWidget {
 	private void initColor() {
 		outerColor = SWTGraphicUtil.getColorSafely(132, 172, 75);
 		outerShadowColor = SWTGraphicUtil.getColorSafely(203, 203, 203);
-		innerColor = outerColor;
-		innerShadowColor = SWTGraphicUtil.getColorSafely(250, 240, 190);
-		preTextColor = SWTGraphicUtil.getColorSafely(33, 33, 33);
-		effectShadowCircleColor = SWTGraphicUtil.getColorSafely(248, 222, 126);
-		effectCircleColor = SWTGraphicUtil.getColorSafely(99, 176, 0);
-	}
-
-	@Deprecated
-	private Color getShadowColor(Color color) {
-
-		int max = 255;
-		int red = color.getRed() + 50;
-		int green = color.getGreen() + 50;
-		int blue = color.getBlue() + 50;
-
-		red = Math.min(red, max);
-		green = Math.min(green, max);
-		blue = Math.min(blue, max);
-
-		Color shadow = SWTGraphicUtil.getColorSafely(red, green, blue);
-		return shadow;
+		innerColor = SWTGraphicUtil.getColorSafely(184, 218, 141);
+		preTextColor = SWTGraphicUtil.getColorSafely(0, 0, 0);
+		effectShadowCircleColor = SWTGraphicUtil.getColorSafely(224, 232, 105);
+		effectCircleColor = SWTGraphicUtil.getColorSafely(96, 153, 16);
 	}
 
 	private void initFont() {
@@ -169,7 +154,7 @@ public class CSPie extends CSWidget {
 
 		effectShadowThickness = effectShadowThickness == Integer.MIN_VALUE ? circlePoint.x : effectShadowThickness;
 		effectThickness = effectThickness == Integer.MIN_VALUE ? circlePoint.x : effectThickness;
-		effectFinish = DEFAULT_THICKNESS / 2;
+		effectFinish = outerThickness - 2;
 		effectFactor = circlePoint.x;
 
 		String valueTxt = state != goal ? getStringOfValue(preGoal) : getStringOfValue(goal);
@@ -179,23 +164,19 @@ public class CSPie extends CSWidget {
 		preValueTxt = getPreValueText();
 		Point preTextPoint = getTextPoint(preValueTxt, preTextFont);
 
-		int shadowAlpha;
 		int innerCircleAlpha;
 		int preTextAlpha;
 
 		if (preStateAlpha == DEFAULT_ALPHA) {
-			shadowAlpha = SHADOW_ALPHA;
 			innerCircleAlpha = DEFAULT_ALPHA;
 			preTextAlpha = DEFAULT_ALPHA;
 		} else {
-			shadowAlpha = preStateAlpha;
 			innerCircleAlpha = preStateAlpha;
 			preTextAlpha = preStateAlpha;
 		}
 
 		// draw outerCircle
 
-//		gc.setAlpha(shadowAlpha);
 		gc.setBackground(outerShadowColor);
 		gc.fillArc(outerCircleX / 2, outerCircleY / 2, circlePoint.x, circlePoint.y, 0, (int) (MAX_STATE * ANGLE));
 
@@ -210,15 +191,11 @@ public class CSPie extends CSWidget {
 		// draw innerCircle
 		if (isDrawPreValue()) {
 
-			gc.setAlpha(shadowAlpha);
-			gc.setBackground(innerShadowColor);
-			gc.fillArc(innerCircleX / 2, innerCircleY / 2, innerCircleWidth, innerCircleHeight, 0,
-					(int) (MAX_STATE * ANGLE));
 			gc.setAlpha(innerCircleAlpha);
 			gc.setBackground(innerColor);
 			gc.fillArc(innerCircleX / 2, innerCircleY / 2, innerCircleWidth, innerCircleHeight, 90, -preArc);
 
-			gc.setAlpha(DEFAULT_ALPHA);
+			gc.setAlpha(SHADOW_ALPHA);
 			gc.setBackground(getBackground());
 			gc.fillArc((innerCircleX + innerThickness) / 2, (innerCircleY + innerThickness) / 2,
 					innerCircleWidth - innerThickness, innerCircleHeight - innerThickness, 0,
@@ -258,7 +235,7 @@ public class CSPie extends CSWidget {
 
 				if (effectShadowThickness == effectFinish && effectThickness == effectFinish) {
 
-					gc.setForeground(SWTGraphicUtil.getColorSafely(0, 0, 0));
+					gc.setForeground(SWTGraphicUtil.getColorSafely(242, 243, 242));
 					FontData fd = getFont().getFontData()[0];
 					fd.setHeight(fd.getHeight() + 2);
 					Font effectFont = new Font(Display.getDefault(), fd);
@@ -328,10 +305,6 @@ public class CSPie extends CSWidget {
 		innerColor = color;
 	}
 
-	public void setInnerShadowCircleColor(Color color) {
-		innerShadowColor = color;
-	}
-
 	public void setPreTextColor(Color color) {
 		preTextColor = color;
 	}
@@ -389,6 +362,7 @@ public class CSPie extends CSWidget {
 
 		if (csPieThread != null) {
 			csPieThread.interrupt();
+			csPieThread = null;
 		}
 		csPieThread = new Thread(new CSPieRunnable());
 	}
@@ -401,23 +375,18 @@ public class CSPie extends CSWidget {
 
 	class CSPieRunnable implements Runnable {
 
-		private float stateValue = 0.0f;
+		BigDecimal stateValue = new BigDecimal(0.0f);
+
 		private float effectShadowAnimationValue = 0.0f;
 		private float effectAnimationValue = 0.0f;
 
 		@Override
 		public void run() {
 
-			while (state != goal) {
+			while (stateValue.floatValue() < 1.0f) {
 
-				if (state != goal) {
-
-					stateValue += 0.01f;
-					state = getState(goal, stateValue);
-					if (state > goal) {
-						state = goal;
-					}
-				}
+				stateValue = stateValue.add(new BigDecimal(0.01f), new MathContext(3));
+				state = getState(goal, stateValue.floatValue());
 
 				try {
 					Thread.sleep(20);
@@ -452,7 +421,7 @@ public class CSPie extends CSWidget {
 			IAnimation effectShadowAnimation = new DecelerateAnimation(0.9f);
 			IAnimation effectAnimation = new DecelerateAnimation(1.3f);
 
-			while (preGoal != goal && (effectShadowThickness != effectFinish || effectThickness != effectFinish)) {
+			while (state == MAX_STATE && (effectShadowThickness != effectFinish || effectThickness != effectFinish)) {
 				if (effectShadowThickness > effectFinish) {
 					effectShadowAnimationValue += 0.01f;
 
